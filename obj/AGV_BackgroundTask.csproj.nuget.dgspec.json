@@ -1,0 +1,68 @@
+{
+  "format": 1,
+  "restore": {
+    "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj": {}
+  },
+  "projects": {
+    "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj",
+        "projectName": "AGV_BackgroundTask",
+        "projectPath": "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj",
+        "packagesPath": "C:\\Users\\osknow\\.nuget\\packages\\",
+        "outputPath": "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\osknow\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net5.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net5.0": {
+            "targetAlias": "net5.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net5.0": {
+          "targetAlias": "net5.0",
+          "dependencies": {
+            "Opc.UaFx.Advanced": {
+              "target": "Package",
+              "version": "[2.32.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.416\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
