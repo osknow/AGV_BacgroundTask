@@ -13,7 +13,7 @@
 *.pdb
 *.casch
 *.FileListAbsolute.txt
-*.AssemblyReferencecasch
+*.AssemblyReference.casch
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
