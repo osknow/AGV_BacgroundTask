@@ -11,9 +11,9 @@
 *.sln.docstates
 *.dll
 *.pdb
-*.casch
+*.cache
 *.FileListAbsolute.txt
-*.AssemblyReference.casch
+*.AssemblyReference.cache
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
