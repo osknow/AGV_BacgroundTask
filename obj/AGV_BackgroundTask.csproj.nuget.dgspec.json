@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj": {}
+    "C:\\Users\\osknowpa\\AGV_BacgroundTask\\AGV_BackgroundTask.csproj": {}
   },
   "projects": {
-    "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj": {
+    "C:\\Users\\osknowpa\\AGV_BacgroundTask\\AGV_BackgroundTask.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj",
+        "projectUniqueName": "C:\\Users\\osknowpa\\AGV_BacgroundTask\\AGV_BackgroundTask.csproj",
         "projectName": "AGV_BackgroundTask",
-        "projectPath": "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj",
+        "projectPath": "C:\\Users\\osknowpa\\AGV_BacgroundTask\\AGV_BackgroundTask.csproj",
         "packagesPath": "C:\\Users\\osknow\\.nuget\\packages\\",
-        "outputPath": "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\obj\\",
+        "outputPath": "C:\\Users\\osknowpa\\AGV_BacgroundTask\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\osknow\\AppData\\Roaming\\NuGet\\NuGet.Config",

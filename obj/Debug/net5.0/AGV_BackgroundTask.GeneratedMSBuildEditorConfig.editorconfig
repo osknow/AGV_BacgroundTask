@@ -7,4 +7,4 @@ build_property.PublishSingleFile =
 build_property.IncludeAllContentForSelfExtract = 
 build_property._SupportedPlatformList = Android,iOS,Linux,macOS,Windows
 build_property.RootNamespace = AGV_BackgroundTask
-build_property.ProjectDir = \\pozfiler01\users$\osknow\Desktop\OSKNOW\Projekty\MVC_ASP_NET_C#\pozmda02\AGV_BackgroundTask\OLD\
+build_property.ProjectDir = C:\Users\osknowpa\AGV_BacgroundTask\

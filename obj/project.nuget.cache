@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "DJeELjCAd0L9xsACALkT8JPctf/dRNlKwGaZ7NE1zFs+e6GY7jxN67LwdLUfB3E/qJEBGqNT0soK5Syt5mELPg==",
+  "dgSpecHash": "/hRizGCbY3YggbtB/PE1CN2lCuH7dmGCQ99Zz9BKPt0RY9YQyJSvpvL7SIsMFowA858cJyQY65Lg8yCctDMRHQ==",
   "success": true,
-  "projectFilePath": "\\\\pozfiler01\\users$\\osknow\\Desktop\\OSKNOW\\Projekty\\MVC_ASP_NET_C#\\pozmda02\\AGV_BackgroundTask\\OLD\\AGV_BackgroundTask.csproj",
+  "projectFilePath": "C:\\Users\\osknowpa\\AGV_BacgroundTask\\AGV_BackgroundTask.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\osknow\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\osknow\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
