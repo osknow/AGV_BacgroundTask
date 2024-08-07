@@ -29,7 +29,7 @@ namespace AGV_BackgroundTask
             await DuniTaskAGV();
             }
             await Main_OpcPaletyzer.SubMain_AGV_Tasks();
-            Console.WriteLine("End...");
+           
         }
  
         //**************
