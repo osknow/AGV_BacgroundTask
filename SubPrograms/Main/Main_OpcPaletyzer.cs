@@ -89,9 +89,9 @@ namespace AGV_BackgroundTask
                     //
                     //__________________________________________________________________________________________
                     #region IPOINT Awaria
-                    //Jeśli wystąpi błąd IPOINTa kasujemy "miejsce" IPOINT żeby zadanie  trafiło do SERWISU
+                    //Jeśli wystąpi błąd IPOINTa kasujemy "miejsce" IPOINT żeby zadanie  trafiło do SERWISU __ JEŚLI funkcja alarmowa jest aktywna !!!
                     //
-                    if (Program.IpointStatus.EndOfMaterial == true || Program.IpointStatus.Fault == true || Program.IpointStatus.SafetyRelay == false || Program.IpointStatus.E_Stop == false)
+                    if ((Program.IpointStatus.EndOfMaterial == true || Program.IpointStatus.Fault == true || Program.IpointStatus.SafetyRelay == false || Program.IpointStatus.E_Stop == false) && Program.IpointStatus.SpecialAlarmFunction)
                     {
                         agv_machine.ipoint = null;
                     }
@@ -190,7 +190,7 @@ namespace AGV_BackgroundTask
                                         {
                                             Console.WriteLine($"Utworzono zadanie AGV dla maszyny {machine.Name} z Id: {CreateTask_pozagv02.responseJSON.createdId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
                                             // Zadanie na serwer POZMDA01
-                                            var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Odbiór pełnej palety_AUTO_" + machine.PalletType.ToString(), Details = $"{ CreateTask_pozagv02.responseJSON.createdId}", Priority = 0 };
+                                            var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Odbiór pełnej palety_AUTO" + machine.PalletType.ToString(), Details = $"{ CreateTask_pozagv02.responseJSON.createdId}", Priority = 0 };
                                             var response = await CreateTask_pozmda02.POST(sBodySerwice);
                                         }
                                         
@@ -253,7 +253,7 @@ namespace AGV_BackgroundTask
                             //SERVICE
                             else if (item.REQ_FullPaletPick && (!agv_machine.pickActive))
                             {
-                                var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_TESTY Odbiór pełnej palety ", Details = machine.PalletType.ToString(), Priority = 0 };
+                                var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE Odbiór pełnej palety AUTO", Details = machine.PalletType.ToString(), Priority = 0 };
                                 // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
                                 foreach (var task in ServiceTasks)
                                 {
@@ -330,7 +330,7 @@ namespace AGV_BackgroundTask
                                         {
                                             Console.WriteLine($"Utworzono zadanie dla maszyny {machine.Name} z Id: {CreateTask_pozagv02.responseJSON.createdId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
                                             //Zadanie na serwer POZMDA01
-                                            var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Dostarczenie pustej palety_AUTO_" + machine.PalletType.ToString(), Details = $"{ CreateTask_pozagv02.responseJSON.createdId}", Priority = 0 };
+                                            var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Dostarczenie pustej palety_AUTO" + machine.PalletType.ToString(), Details = $"{ CreateTask_pozagv02.responseJSON.createdId}", Priority = 0 };
                                             var response = await CreateTask_pozmda02.POST(sBodySerwice);
                                         }
                                     }
@@ -362,7 +362,7 @@ namespace AGV_BackgroundTask
                             //SERVICE
                             else if (item.REQ_EmptyPaletsDrop && (!agv_machine.dropActive))
                             {
-                                var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_TESTY Dostarczenie pustej palety ", Details = machine.PalletType.ToString(), Priority = 0 };
+                                var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE Dostarczenie pustej palety AUTO ", Details = machine.PalletType.ToString(), Priority = 0 };
                                 // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
                                 foreach (var task in ServiceTasks)
                                 {
