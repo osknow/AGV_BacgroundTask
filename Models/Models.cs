@@ -166,4 +166,12 @@ namespace AGV_BackgroundTask
         public int result { get; set; }
         public int createdId { get; set; }
     }
+    public class MissionsPozagv02_sBodyResponse
+    {
+        public string ExternalId { get; set; }
+        public int InternalId { get; set; }
+        public bool Success { get; set; }
+        public string Description { get; set; }
+        public string ReplyResult { get; set; }
+    }
 }

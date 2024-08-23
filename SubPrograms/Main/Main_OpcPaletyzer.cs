@@ -79,6 +79,22 @@ namespace AGV_BackgroundTask
             //Current tasks from pozagv02
             var  tasks = Program.tasks_pozagv02;
             //
+            //
+            int MissionPickupId = 0;
+            int MissionPickupShelfId = 0;
+            int MissionPickupRequiredLoadType = 0;
+            int MissionDropoffId = 0;
+            int MissionDropoffShelfId = 0;
+            int MissionDropoffRequiredLoadType = 0;
+            //MOSTEK TETSOWY
+            //_____________________________________
+            //
+            //
+            OPCNode[1].REQ_EmptyPaletsDrop = true;
+            //
+            //
+            //_____________________________________
+            //
             foreach (var item in OPCNode )
             {
                 foreach (var agv_machine in AGV_MatrixModel)
@@ -102,9 +118,10 @@ namespace AGV_BackgroundTask
                         if ((item.MachineName == agv_machine.name && agv_machine.name == machine.Name) || (item.MachineName == agv_machine.name && agv_machine.name == "PSM067" && machine.Name=="PSM006"))
                         {
                             // Konieczność stworzenia zadania dla AGV lub Serwisu w zależnośći od ustawień.
-                            //AGV
+                            //AGV FUll
                             if (item.REQ_FullPaletPick && agv_machine.pickActive)
                             {
+
                                 // Zadanie dla AGV
                                 #region sBody
                                 var sBodySerwiceAGV = new CreateTaskPozagv02_sBody() { machineType ="", startTime="", priority=4,};
@@ -112,28 +129,40 @@ namespace AGV_BackgroundTask
                                 if (machine.PalletType == EnumPalletType.Euro || machine.PalletType == EnumPalletType.NewEuro || machine.PalletType == EnumPalletType.EuroChep || machine.PalletType == EnumPalletType.EuroJYSK)
                                 {
                                     sBodySerwiceAGV.pickupLocation = agv_machine.pick;
+                                        MissionPickupId = Convert.ToInt16(agv_machine.pick);
                                     sBodySerwiceAGV.targetLocation = agv_machine.ipoint;
+                                        MissionDropoffId = Convert.ToInt16(agv_machine.ipoint);
                                     sBodySerwiceAGV.resourceTypes = 3;
+                                        MissionDropoffRequiredLoadType = 3;
+                                        MissionPickupRequiredLoadType = 3;
                                     sBodySerwiceAGV.targetShelfId = 1;
+                                        MissionDropoffShelfId = 1;
                                     //
                                     if (agv_machine.shelf)
                                     {
                                         sBodySerwiceAGV.pickupShelfId = 1;
+                                            MissionPickupShelfId = 1;
                                     }
                                     else
                                     {
                                         sBodySerwiceAGV.pickupShelfId = -1;
+                                            MissionPickupShelfId = -1;
                                     }
                                 }
                                 else if(machine.PalletType == EnumPalletType.Ang || machine.PalletType == EnumPalletType.AngChep )
                                 {
                                     sBodySerwiceAGV.pickupLocation = agv_machine.pick;
+                                        MissionPickupId = Convert.ToInt16(agv_machine.pick);
                                     sBodySerwiceAGV.targetLocation = agv_machine.ipoint;
+                                        MissionDropoffId = Convert.ToInt16(agv_machine.ipoint);
                                     sBodySerwiceAGV.resourceTypes = 1;
+                                        MissionDropoffRequiredLoadType = 1;
+                                        MissionPickupRequiredLoadType = 1;
                                     sBodySerwiceAGV.targetShelfId = 2;
+                                        MissionDropoffShelfId = 2;
                                     //
                                     sBodySerwiceAGV.pickupShelfId = 2;
-          
+                                        MissionPickupShelfId = 2;
                                 }
                                 #endregion
                                 // Sprawdzenie czy komórka w MachineMatrix NIE jest pusta: jeśli tak to zadanie z automatu do seriwsu. 
@@ -142,10 +171,10 @@ namespace AGV_BackgroundTask
                                     // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
                                     foreach (var task in Program.tasks_pozagv02)
                                     {
-                                        if(! (task.MissionType == "Wait" || task.MissionType == "Manual"))
+                                        if(! (task.MissionType == "Wait" || task.MissionType == "Manual" || task.MissionType == "Charge"))
                                         { 
                                             var finalTargetId = task.FinalTarget.Split(" ");
-                                            if (finalTargetId[1] == "4001" && task.Steps[0].CurrentTarget == agv_machine.pick)
+                                            if (finalTargetId[1] == "4001" && task.Steps[0].CurrentTarget.Contains(agv_machine.pick))
                                             {
                                                 AGV_TaskExist = true;   
                                             }
@@ -153,16 +182,12 @@ namespace AGV_BackgroundTask
                                     }
                                     if (AGV_TaskExist == false)
                                     {
-                                        //Tworzebnie palety dla systemu AGV
-                                        if (sBodySerwiceAGV.targetLocation.Contains("I-POINT") && SERVICE_TaskExist == false)
+                                        //Tworzenie palety dla systemu AGV
+                                        if (sBodySerwiceAGV.targetLocation.Contains("4001") && SERVICE_TaskExist == false)
                                         {
-                                            var IdPoint = sBodySerwiceAGV.pickupLocation.Split(" ");
-                                            string IntIdPoint = IdPoint[1].Remove(0, 1);
-                                            IntIdPoint = IntIdPoint.Remove(IntIdPoint.Length - 1);
-                                            int id = Int32.Parse(IntIdPoint);
                                             var pallet = new ResourceAtLocation()
                                             {
-                                                symbolicPointId = id,
+                                                symbolicPointId = Convert.ToInt16(sBodySerwiceAGV.pickupLocation),
                                                 resourceType = sBodySerwiceAGV.resourceTypes,
                                                 amount = 1,
                                                 shelfId = sBodySerwiceAGV.pickupShelfId
@@ -177,8 +202,64 @@ namespace AGV_BackgroundTask
                                         }
                                         HttpResponseMessage responseAGV=new HttpResponseMessage();
                                         // Tworzenie zadania
-                                        try { 
-                                        responseAGV = await CreateTask_pozagv02.POST(sBodySerwiceAGV);
+                                        try {
+                                            #region MissionBody
+
+                                            //
+                                            var sBodyMissinsAGV = new
+                                            {
+                                                ExternalId = "Zadanie PALL: "+item.MachineName,
+                                                Name = "DUNI_TASK_AGV",
+                                                Options = new
+                                                {
+                                                    Priority = 4
+                                                },
+                                                Steps = new object[]
+                                                    {
+                                                    new {
+                                                        StepType = "Pickup",
+                                                        Options = new
+                                                        {
+                                                            Load = new
+                                                            {
+                                                                RequiredLoadStatus = "LoadAtLocation",
+                                                                RequiredLoadType = MissionPickupRequiredLoadType
+                                                            },
+                                                            SortingRules = new[] { "Priority", "Closest" }
+                                                        },
+                                                        AllowedTargets = new[]
+                                                        {
+                                                            new { Id = MissionPickupId, ShelfId = MissionPickupShelfId }
+                                                        }
+                                                    }, // <- Brakujący nawias klamrowy został dodany tutaj
+                                                    new
+                                                    {
+                                                        StepType = "Dropoff",
+                                                        Options = new
+                                                        {
+                                                            Load = new
+                                                            {
+                                                                RequiredLoadType = MissionDropoffRequiredLoadType,
+                                                                RequiredLoadStatus = "LocationHasRoom"
+                                                            }
+                                                        },
+                                                        AllowedTargets = new[]
+                                                        {
+                                                            new { Id = MissionDropoffId, ShelfId = MissionDropoffShelfId }
+                                                        },
+                                                        AllowedWaits = new[]
+                                                        {
+                                                            new { Id = 6010 },
+                                                            new { Id = 6009 }
+                                                        }
+                                                    }
+                                                    }
+                                            };
+
+                                            #endregion
+                                            //
+                                            responseAGV = await CreateMission_pozagv02.POST(sBodyMissinsAGV);
+                                        
                                         }
                                         catch
                                         {
@@ -186,11 +267,11 @@ namespace AGV_BackgroundTask
                                         }
                                         //
                                          
-                                        if (responseAGV.IsSuccessStatusCode)
+                                        if (responseAGV.IsSuccessStatusCode && CreateMission_pozagv02.responseJSON.Success)
                                         {
-                                            Console.WriteLine($"Utworzono zadanie AGV dla maszyny {machine.Name} z Id: {CreateTask_pozagv02.responseJSON.createdId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
+                                            Console.WriteLine($"Utworzono zadanie AGV dla maszyny {machine.Name} z Id: {CreateMission_pozagv02.responseJSON.InternalId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
                                             // Zadanie na serwer POZMDA01
-                                            var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Odbiór pełnej palety_AUTO" + machine.PalletType.ToString(), Details = $"{ CreateTask_pozagv02.responseJSON.createdId}", Priority = 0 };
+                                            var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Odbiór pełnej palety_AUTO " + machine.PalletType.ToString(), Details = $"{ CreateMission_pozagv02.responseJSON.InternalId}", Priority = 0 };
                                             var response = await CreateTask_pozmda02.POST(sBodySerwice);
                                         }
                                         
@@ -206,7 +287,11 @@ namespace AGV_BackgroundTask
                                     {
                                         if (task.machineNumber == sBodySerwice.MachineNumber && task.name == sBodySerwice.Name)
                                         {
-                                            SERVICE_TaskExist = true;
+                                            //Sprawdzenie czy task istnieje już na tablecie serwisanta.
+                                            if (task.name.Contains("Odbór"))
+                                            {
+                                                SERVICE_TaskExist = true;
+                                            }
                                         }
                                         else { 
                                             // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
@@ -216,18 +301,10 @@ namespace AGV_BackgroundTask
                                                 {
                                                     //
                                                     var finalTargetId = task2.FinalTarget.Split(" ");
-                                                    var CurrentTarget_name = task2.Steps[0].CurrentTarget.Split(" ");
-                                                    var IntCurrentTarget_name = Int32.Parse(CurrentTarget_name[1]);
-                                                    //
-                                                    var IdAgv = agv_machine.pick.Split(" ");
-                                                    string IntIdAGV = IdAgv[1].Remove(0, 1);
-                                                    IntIdAGV = IntIdAGV.Remove(IntIdAGV.Length - 1);
-                                                    int id = Int32.Parse(IntIdAGV);
-                                                    //
-                                                    if ((finalTargetId[1] == "4001" && task2.Steps[0].CurrentTarget == agv_machine.pick) || (finalTargetId[1] == "4001" && IntCurrentTarget_name == id))
+                                                    if (finalTargetId[1] == "4001" && task2.Steps[0].CurrentTarget.Contains(agv_machine.pick))
                                                     {
                                                         SERVICE_TaskExist = true;
-                                                    }
+                                                    }  
                                                 }
                                             }
                                         }
@@ -250,16 +327,19 @@ namespace AGV_BackgroundTask
 
 
                             }
-                            //SERVICE
+                            //SERVICE Full
                             else if (item.REQ_FullPaletPick && (!agv_machine.pickActive))
                             {
-                                var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE Odbiór pełnej palety AUTO", Details = machine.PalletType.ToString(), Priority = 0 };
+                                var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_Odbiór pełnej palety AUTO ", Details = machine.PalletType.ToString(), Priority = 0 };
                                 // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
                                 foreach (var task in ServiceTasks)
                                 {
                                     if (task.machineNumber == sBodySerwice.MachineNumber && task.name == sBodySerwice.Name)
                                     {
-                                        SERVICE_TaskExist = true;
+                                        if (task.name.Contains("Odbiór"))
+                                        {
+                                            SERVICE_TaskExist = true;
+                                        }
                                     }
                                 }
                                 if (SERVICE_TaskExist == false)
@@ -274,7 +354,10 @@ namespace AGV_BackgroundTask
                                 }
                                 SERVICE_TaskExist = false;
                             }
-                            //AGV
+                            //AGV Empty
+                            //
+                            // TO DO YET
+                            //
                             if (item.REQ_EmptyPaletsDrop && agv_machine.dropActive)
                             {
                                 // Zadanie dla AGV
@@ -284,27 +367,40 @@ namespace AGV_BackgroundTask
                                 if (machine.PalletType == EnumPalletType.Euro || machine.PalletType == EnumPalletType.NewEuro || machine.PalletType == EnumPalletType.EuroChep || machine.PalletType == EnumPalletType.EuroJYSK)
                                 {
                                     sBodySerwiceAGV.pickupLocation = agv_machine.pp_e;
+                                        MissionPickupId = Convert.ToInt16(agv_machine.pp_e);
                                     sBodySerwiceAGV.targetLocation = agv_machine.drop;
+                                        MissionDropoffId = Convert.ToInt16(agv_machine.drop);
                                     sBodySerwiceAGV.resourceTypes = 3;
+                                        MissionPickupRequiredLoadType = 3;
+                                        MissionDropoffRequiredLoadType = 3;
                                     sBodySerwiceAGV.pickupShelfId = -1;
+                                        MissionPickupShelfId = -1;
                                     //
                                     if (agv_machine.shelf)
                                     {
                                         sBodySerwiceAGV.targetShelfId = 1;
+                                            MissionDropoffShelfId = 1;
                                     }
                                     else
                                     {
                                         sBodySerwiceAGV.targetShelfId = -1;
+                                            MissionDropoffShelfId = -1;
                                     }
                                 }
                                 else if (machine.PalletType == EnumPalletType.Ang || machine.PalletType == EnumPalletType.AngChep)
                                 {
                                     sBodySerwiceAGV.pickupLocation = agv_machine.pp_a;
+                                        MissionPickupId = Convert.ToInt16(agv_machine.pp_e);
                                     sBodySerwiceAGV.targetLocation = agv_machine.drop;
+                                        MissionPickupId = Convert.ToInt16(agv_machine.drop);
                                     sBodySerwiceAGV.resourceTypes = 1;
+                                        MissionPickupRequiredLoadType = 1;
+                                        MissionDropoffRequiredLoadType = 1;
                                     sBodySerwiceAGV.pickupShelfId = -1;
+                                        MissionPickupShelfId = -1;
                                     //
                                     sBodySerwiceAGV.targetShelfId = 2;
+                                    MissionDropoffShelfId = 2;
 
                                 }
                                 #endregion
@@ -313,62 +409,98 @@ namespace AGV_BackgroundTask
                                     // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
                                     foreach (var task in Program.tasks_pozagv02)
                                     {
-                                        var pickId = agv_machine.drop.Split(" ");
-                                        string stringPickId = pickId[1].Remove(pickId[1].Length - 1);
-                                        stringPickId = stringPickId.Substring(1);
-                                        var finalTargetId = task.FinalTarget.Split(" ");
-                                        if (stringPickId == finalTargetId[1])
+                                        if (!(task.MissionType == "Wait" || task.MissionType == "Manual" || task.MissionType == "Charge"))
                                         {
-                                            AGV_TaskExist = true;
+                                            if (task.Steps[1].CurrentTarget.Contains(agv_machine.drop))
+                                            {
+                                                AGV_TaskExist = true;
+                                            }
                                         }
                                     }
                                     if(AGV_TaskExist == false)
-                                    { 
-                                        var responseAGV = await CreateTask_pozagv02.POST(sBodySerwiceAGV);
+                                    {
+                                        #region MissionBody
+
+                                        //
+                                        var sBodyMissinsAGV = new
+                                        {
+                                            ExternalId = "Zadanie PALL: " + item.MachineName,
+                                            Name = "DUNI_TASK_AGV",
+                                            Options = new
+                                            {
+                                                Priority = 4
+                                            },
+                                            Steps = new object[]
+                                                {
+                                                    new {
+                                                        StepType = "Pickup",
+                                                        Options = new
+                                                        {
+                                                            Load = new
+                                                            {
+                                                                RequiredLoadStatus = "LoadAtLocation",
+                                                                RequiredLoadType = MissionPickupRequiredLoadType
+                                                            },
+                                                            SortingRules = new[] { "Priority", "Closest" }
+                                                        },
+                                                        AllowedTargets = new[]
+                                                        {
+                                                            new { Id = MissionPickupId, ShelfId = MissionPickupShelfId }
+                                                        }
+                                                    }, // <- Brakujący nawias klamrowy został dodany tutaj
+                                                    new
+                                                    {
+                                                        StepType = "Dropoff",
+                                                        Options = new
+                                                        {
+                                                            Load = new
+                                                            {
+                                                                RequiredLoadType = MissionDropoffRequiredLoadType,
+                                                                RequiredLoadStatus = "LocationHasRoom"
+                                                            }
+                                                        },
+                                                        AllowedTargets = new[]
+                                                        {
+                                                            new { Id = MissionDropoffId, ShelfId = MissionDropoffShelfId }
+                                                        }
+                                                    }
+                                                }
+                                        };
+
+                                        #endregion
+                                        //
+                                        var responseAGV = await CreateMission_pozagv02.POST(sBodyMissinsAGV);
+
                                         //
                                         if (responseAGV.IsSuccessStatusCode)
                                         {
-                                            Console.WriteLine($"Utworzono zadanie dla maszyny {machine.Name} z Id: {CreateTask_pozagv02.responseJSON.createdId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
+                                            Console.WriteLine($"Utworzono zadanie dla maszyny {machine.Name} z Id: {CreateMission_pozagv02.responseJSON.InternalId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
                                             //Zadanie na serwer POZMDA01
-                                            var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Dostarczenie pustej palety_AUTO" + machine.PalletType.ToString(), Details = $"{ CreateTask_pozagv02.responseJSON.createdId}", Priority = 0 };
+                                            var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Dostarczenie pustej palety_AUTO " + machine.PalletType.ToString(), Details = $"{ CreateMission_pozagv02.responseJSON.InternalId}", Priority = 0 };
                                             var response = await CreateTask_pozmda02.POST(sBodySerwice);
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_Dostarczenie pustej palety_AUTO ", Details = machine.PalletType.ToString(), Priority = 0 };
-                                    // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
-                                    foreach (var task in ServiceTasks)
-                                    {
-                                        if (task.machineNumber == sBodySerwice.MachineNumber && task.name == sBodySerwice.Name)
-                                        {
-                                            SERVICE_TaskExist = true;
-                                        }
-                                    }
-                                    if (SERVICE_TaskExist == false)
-                                    {
-                                        // Zadanie dla SERWISU
-                                        var response = await CreateTask_pozmda02.POST(sBodySerwice);
-                                        if (response.IsSuccessStatusCode)
-                                        {
-                                            Console.WriteLine($"Utworzono zadanie dla SERWISU dla maszyny {machine.Name}. | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
-                                        }
-                                    }
+                                    // Brak przypadku gdzie dla stosów palet pustych kasujemy
+                                    // TARGET lub PICKUP PointName bo  IPOINT mający błąd / awarię nie jest problemem dla dostarczania stosów.  
                                 }
                                 AGV_TaskExist = false;
                                 SERVICE_TaskExist = false;
                             }
-                            //SERVICE
+                            //SERVICE Empty
                             else if (item.REQ_EmptyPaletsDrop && (!agv_machine.dropActive))
                             {
-                                var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE Dostarczenie pustej palety AUTO ", Details = machine.PalletType.ToString(), Priority = 0 };
+                                var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_Dostarczenie pustej palety AUTO ", Details = machine.PalletType.ToString(), Priority = 0 };
                                 // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
                                 foreach (var task in ServiceTasks)
                                 {
                                     if (task.machineNumber == sBodySerwice.MachineNumber && task.name == sBodySerwice.Name)
                                     {
-                                        SERVICE_TaskExist = true;
+                                        if (task.name.Contains("Dostarczenie")) { 
+                                            SERVICE_TaskExist = true;
+                                        }
                                     }
                                 }
                                 if (SERVICE_TaskExist == false)
