@@ -86,15 +86,6 @@ namespace AGV_BackgroundTask
             int MissionDropoffId = 0;
             int MissionDropoffShelfId = 0;
             int MissionDropoffRequiredLoadType = 0;
-            //MOSTEK TETSOWY
-            //_____________________________________
-            //
-            //
-            OPCNode[1].REQ_EmptyPaletsDrop = true;
-            //
-            //
-            //_____________________________________
-            //
             foreach (var item in OPCNode )
             {
                 foreach (var agv_machine in AGV_MatrixModel)
