@@ -199,7 +199,7 @@ namespace AGV_BackgroundTask
                                             //
                                             var sBodyMissinsAGV = new
                                             {
-                                                ExternalId = "Zadanie PALL: "+item.MachineName,
+                                                ExternalId = "Zadanie PALL Pick: "+item.MachineName,
                                                 Name = "DUNI_TASK_AGV",
                                                 Options = new
                                                 {
@@ -415,7 +415,7 @@ namespace AGV_BackgroundTask
                                         //
                                         var sBodyMissinsAGV = new
                                         {
-                                            ExternalId = "Zadanie PALL: " + item.MachineName,
+                                            ExternalId = "Zadanie PALL Drop: " + item.MachineName,
                                             Name = "DUNI_TASK_AGV",
                                             Options = new
                                             {
