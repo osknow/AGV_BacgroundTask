@@ -108,9 +108,9 @@ namespace AGV_BackgroundTask
                     {
                         if ((item.MachineName == agv_machine.name && agv_machine.name == machine.Name) || (item.MachineName == agv_machine.name && agv_machine.name == "PSM067" && machine.Name=="PSM006"))
                         {
-                            // Konieczność stworzenia zadania dla AGV lub Serwisu w zależnośći od ustawień.
-                            //AGV FUll
-                            if (item.REQ_FullPaletPick && agv_machine.pickActive)
+                                // Konieczność stworzenia zadania dla AGV lub Serwisu w zależnośći od ustawień.
+                                //AGV FUll
+                                if (item.REQ_FullPaletPick && agv_machine.pickActive)
                             {
 
                                 // Zadanie dla AGV
