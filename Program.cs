@@ -165,46 +165,48 @@ namespace AGV_BackgroundTask
                 var jsonserialize = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 client.DefaultRequestHeaders.Add("ApiKey", "C1XUN3agvZ9P2ER");
                 client.DefaultRequestHeaders.Add("Content", "application/json");
+                //
+                #region Ustawianie Palet W starych Stosach 
+                //
+                //var PSM_038_ENG = new ResourceAtLocation()
+                //{
+                //    symbolicPointId = 3001,
+                //    resourceType = 2,
+                //    amount = 8,
+                //    shelfId = -1
+                //};
+                //var PSM_054_PALL = new ResourceAtLocation()
+                //{
+                //    symbolicPointId = 2001,
+                //    resourceType = 4,
+                //    amount = 8,
+                //    shelfId = -1
+                //}; ;
 
-                var PSM_038_ENG = new ResourceAtLocation()
-                {
-                    symbolicPointId = 3001,
-                    resourceType = 2,
-                    amount = 8,
-                    shelfId = -1
-                };
-                var PSM_054_PALL = new ResourceAtLocation()
-                {
-                    symbolicPointId = 2001,
-                    resourceType = 4,
-                    amount = 8,
-                    shelfId = -1
-                }; ;
-
-                var response_2 = await client.PostAsJsonAsync(url_ResourcesAtLocation, PSM_038_ENG);
+                //var response_2 = await client.PostAsJsonAsync(url_ResourcesAtLocation, PSM_038_ENG);
 
 
-                if (response_2.IsSuccessStatusCode)
-                {
-                    string responseString = await response_2.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    Console.WriteLine($"{response_2.StatusCode} , {response_2.RequestMessage}");
-                }
+                //if (response_2.IsSuccessStatusCode)
+                //{
+                //    string responseString = await response_2.Content.ReadAsStringAsync();
+                //}
+                //else
+                //{
+                //    Console.WriteLine($"{response_2.StatusCode} , {response_2.RequestMessage}");
+                //}
 
-                var response_3 = await client.PostAsJsonAsync(url_ResourcesAtLocation, PSM_054_PALL);
+                //var response_3 = await client.PostAsJsonAsync(url_ResourcesAtLocation, PSM_054_PALL);
 
-                
-                if (response_3.IsSuccessStatusCode)
-                {
-                    string responseString = await response_3.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    Console.WriteLine($"{response_3.StatusCode} , {response_3.RequestMessage}");
-                }
 
+                //if (response_3.IsSuccessStatusCode)
+                //{
+                //    string responseString = await response_3.Content.ReadAsStringAsync();
+                //}
+                //else
+                //{
+                //    Console.WriteLine($"{response_3.StatusCode} , {response_3.RequestMessage}");
+                //}
+                #endregion
             }
         }
         

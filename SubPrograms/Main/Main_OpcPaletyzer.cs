@@ -111,8 +111,7 @@ namespace AGV_BackgroundTask
                                 // Konieczność stworzenia zadania dla AGV lub Serwisu w zależnośći od ustawień.
                                 //AGV FUll
                                 if (item.REQ_FullPaletPick && agv_machine.pickActive)
-                            {
-
+                                {
                                 // Zadanie dla AGV
                                 #region sBody
                                 var sBodySerwiceAGV = new CreateTaskPozagv02_sBody() { machineType ="", startTime="", priority=4,};
@@ -284,20 +283,20 @@ namespace AGV_BackgroundTask
                                                 SERVICE_TaskExist = true;
                                             }
                                         }
-                                        else { 
-                                            // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
-                                            foreach (var task2 in Program.tasks_pozagv02)
+ 
+                                        // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
+                                        foreach (var task2 in Program.tasks_pozagv02)
+                                        {
+                                            if (!(task2.MissionType == "Wait" || task2.MissionType == "Manual"))
                                             {
-                                                if (!(task2.MissionType == "Wait" || task2.MissionType == "Manual"))
+                                                //
+                                                var finalTargetId = task2.FinalTarget.Split(" ");
+                                                if (finalTargetId[1] == "4001" && task2.Steps[0].CurrentTarget.Contains(agv_machine.pick))
                                                 {
-                                                    //
-                                                    var finalTargetId = task2.FinalTarget.Split(" ");
-                                                    if (finalTargetId[1] == "4001" && task2.Steps[0].CurrentTarget.Contains(agv_machine.pick))
-                                                    {
-                                                        SERVICE_TaskExist = true;
-                                                    }  
-                                                }
+                                                    SERVICE_TaskExist = true;
+                                                }  
                                             }
+                                            
                                         }
 
                                     }
