@@ -38,7 +38,7 @@ namespace AGV_BackgroundTask
         //**************
         static async Task<bool> IPOINT_Sequencer()
         {
-            bool status_out = false;
+            //bool status_out = false;
             bool status_E_Stop = false;
             bool status_Fault = false;
             bool status_SafetyRelay = false;
@@ -51,7 +51,7 @@ namespace AGV_BackgroundTask
                 var client = new OpcClient("opc.tcp://POZOPC01:5013/POZOPC_IPOINT_AGV");
                 client.Connect();
                 //
-                var Place_status = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Place_1 Free");
+                //var Place_status = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Place_1 Free");
                 var E_Stop = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.OWIJARKA E-STOP");
                 var Alarm = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.OWIJARKA BLAD");
                 var SafetyRelay = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.OWIJARKA Obwod Bezpieczenstwa");
@@ -59,9 +59,9 @@ namespace AGV_BackgroundTask
                 var TimeOfPalletOnEntrance = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Place_1_CzasPostoju");
                 // FREE     : TRUE
                 // OCUPATED : FALSE
-                bool status = Convert.ToBoolean(Place_status.Value);
+                //bool status = Convert.ToBoolean(Place_status.Value);
 
-                status_out = status;
+                //status_out = status;
                 status_E_Stop = Convert.ToBoolean(E_Stop.Value);
                 status_Fault = Convert.ToBoolean(Alarm.Value);
                 status_SafetyRelay = Convert.ToBoolean(SafetyRelay.Value);
@@ -74,32 +74,32 @@ namespace AGV_BackgroundTask
                 Console.WriteLine($"Error:  Błąd odczytania bazy danych OPC.");
                 throw;
             }
-            if (status_out == true)
-            {
-                //ResourceAtLocation_Euro();
-                //Thread.Sleep(100);
-                try { 
-                HttpResponseMessage response = await IPOINT_Resourse_pozagv02.ResetPallet();
-                }
-                catch(Exception e)
-                {
-                    // Błąd komunikacji.
-                    return false;
-                }
+            //if (status_out == true)
+            //{
+            //    //ResourceAtLocation_Euro();
+            //    //Thread.Sleep(100);
+            //    try { 
+            //    HttpResponseMessage response = await IPOINT_Resourse_pozagv02.ResetPallet();
+            //    }
+            //    catch(Exception e)
+            //    {
+            //        // Błąd komunikacji.
+            //        return false;
+            //    }
                       
-            }
-            else
-            {
-                //Miejsce zajęte - zablokować oba miejca dla czytelnośći że zrobił to bacground Task.
-                try
-                {
-                    await IPOINT_Resourse_pozagv02.SetPallet();
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+            //}
+            //else
+            //{
+            //    //Miejsce zajęte - zablokować oba miejca dla czytelnośći że zrobił to bacground Task.
+            //    try
+            //    {
+            //        await IPOINT_Resourse_pozagv02.SetPallet();
+            //    }
+            //    catch
+            //    {
+            //        return false;
+            //    }
+            //}
             //
             //Sprawdzenie czasu postoju palety na miejscu odkładczym IPOINT i ustwaiie alarmuw moemncie przekroczenia czasu z założonym.
             //
