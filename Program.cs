@@ -15,11 +15,13 @@ namespace AGV_BackgroundTask
         public static AGV_SubMachine IpointStatus = new AGV_SubMachine();
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Początek : " + DateTime.Now);
+            //
 #if !DEBUG
       
             Console.SetOut(new MyLoger("W:\\BackgroundTasks\\AGV\\logs"));
 #endif
+
+            Console.WriteLine("Początek : " + DateTime.Now);
             //Status mówi o tym czy działa komunikacja z serwerem pozagv02.
             bool ststusPozagv02 = await IPOINT_Sequencer();
             if (ststusPozagv02)
