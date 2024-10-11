@@ -15,6 +15,7 @@ namespace AGV_BackgroundTask
         public static AGV_SubMachine IpointStatus = new AGV_SubMachine();
         static async Task Main(string[] args)
         {
+            Console.WriteLine("Początek : " + DateTime.Now);
 #if !DEBUG
       
             Console.SetOut(new MyLoger("W:\\BackgroundTasks\\AGV\\logs"));
@@ -29,7 +30,7 @@ namespace AGV_BackgroundTask
             await DuniTaskAGV();
             }
             await Main_OpcPaletyzer.SubMain_AGV_Tasks();
-           
+            Console.WriteLine("Koniec : " + DateTime.Now);
         }
  
         //**************
@@ -74,6 +75,7 @@ namespace AGV_BackgroundTask
                 Console.WriteLine($"Error:  Błąd odczytania bazy danych OPC.");
                 throw;
             }
+            #region ToDelete
             //if (status_out == true)
             //{
             //    //ResourceAtLocation_Euro();
@@ -86,7 +88,7 @@ namespace AGV_BackgroundTask
             //        // Błąd komunikacji.
             //        return false;
             //    }
-                      
+
             //}
             //else
             //{
@@ -100,6 +102,7 @@ namespace AGV_BackgroundTask
             //        return false;
             //    }
             //}
+            #endregion
             //
             //Sprawdzenie czasu postoju palety na miejscu odkładczym IPOINT i ustwaiie alarmuw moemncie przekroczenia czasu z założonym.
             //

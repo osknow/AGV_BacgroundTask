@@ -271,11 +271,11 @@ namespace AGV_BackgroundTask
                                 // Przypadek gdy przełącznik "Funkcja alarmowa IPOINTA" jest przełączony i AGV nie będzi epodejmował działań- tylko SERWIS.
                                 else
                                 {
-                                    var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_Odbiór pełnej palety_AUTO ", Details = machine.PalletType.ToString(), Priority = 0 };
-                                    // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
+                                    var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_Odbiór pełnej palety AUTO ", Details = machine.PalletType.ToString(), Priority = 0 };
+                                    // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV i dla Serwisu.
                                     foreach (var task in ServiceTasks)
-                                    {
-                                        if (task.machineNumber == sBodySerwice.MachineNumber && task.name == sBodySerwice.Name)
+                                    { 
+                                        if (task.machineNumber == sBodySerwice.MachineNumber)
                                         {
                                             //Sprawdzenie czy task istnieje już na tablecie serwisanta.
                                             if (task.name.Contains("Odbór"))
@@ -324,7 +324,7 @@ namespace AGV_BackgroundTask
                                 // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
                                 foreach (var task in ServiceTasks)
                                 {
-                                    if (task.machineNumber == sBodySerwice.MachineNumber && task.name == sBodySerwice.Name)
+                                    if (task.machineNumber == sBodySerwice.MachineNumber)
                                     {
                                         if (task.name.Contains("Odbiór"))
                                         {
