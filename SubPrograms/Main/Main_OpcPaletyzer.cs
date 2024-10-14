@@ -62,7 +62,8 @@ namespace AGV_BackgroundTask
         //
         //
         //
-        static List<OPCNode_Paletyzer> OPCNode = new List<OPCNode_Paletyzer> { OPC_PSM003, OPC_PSM004, OPC_PSM017, OPC_PSM054,OPC_PSM067};
+        //static List<OPCNode_Paletyzer> OPCNode = new List<OPCNode_Paletyzer> { OPC_PSM003, OPC_PSM004, OPC_PSM017, OPC_PSM054,OPC_PSM067};
+        static List<OPCNode_Paletyzer> OPCNode = new List<OPCNode_Paletyzer> {  OPC_PSM054};
         #endregion
         //
         //
@@ -532,7 +533,7 @@ namespace AGV_BackgroundTask
                     {
 
                         Console.WriteLine($"Problem with machine: {item.MachineName} // Type: {0}. Message : {1}", e.GetType(), e.Message);
-                        throw;
+                        Console.WriteLine(e);
                     }
 
             }
