@@ -62,8 +62,8 @@ namespace AGV_BackgroundTask
         //
         //
         //
-        //static List<OPCNode_Paletyzer> OPCNode = new List<OPCNode_Paletyzer> { OPC_PSM003, OPC_PSM004, OPC_PSM017, OPC_PSM054,OPC_PSM067};
-        static List<OPCNode_Paletyzer> OPCNode = new List<OPCNode_Paletyzer> {  OPC_PSM054};
+        static List<OPCNode_Paletyzer> OPCNode = new List<OPCNode_Paletyzer> { OPC_PSM003, OPC_PSM004, OPC_PSM017, OPC_PSM054,OPC_PSM067};
+        
         #endregion
         //
         //
@@ -99,7 +99,7 @@ namespace AGV_BackgroundTask
                     #region IPOINT Awaria
                     //Jeśli wystąpi błąd IPOINTa kasujemy "miejsce" IPOINT żeby zadanie  trafiło do SERWISU __ JEŚLI funkcja alarmowa jest aktywna !!!
                     //
-                    if ((Program.IpointStatus.EndOfMaterial == true || Program.IpointStatus.Fault == true || Program.IpointStatus.SafetyRelay == false || Program.IpointStatus.E_Stop == false) && Program.IpointStatus.SpecialAlarmFunction)
+                    if ((Program.IpointStatus.EndOfMaterial == true || Program.IpointStatus.Fault == true || Program.IpointStatus.SafetyRelay == false || Program.IpointStatus.E_Stop == false) && Program.IpointStatus.SpecialAlarmFunction || Program.IpointStatus.Error_PaletNotPicked)
                     {
                         agv_machine.ipoint = null;
                     }
@@ -171,7 +171,19 @@ namespace AGV_BackgroundTask
                                             }
                                         }
                                     }
-                                    if (AGV_TaskExist == false)
+                                    // Dodane 15_10_2024
+                                    // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla Serwice.
+                                    foreach (var task in ServiceTasks)
+                                    {
+                                        if (task.machineNumber == item.MachineName)
+                                        {
+                                            if (task.name.Contains("SERVICE_Odbiór"))
+                                            {
+                                                AGV_TaskExist = true;
+                                            }
+                                        }
+                                    }
+                                        if (AGV_TaskExist == false)
                                     {
                                         //Tworzenie palety dla systemu AGV
                                         if (sBodySerwiceAGV.targetLocation.Contains("4001") && SERVICE_TaskExist == false)
@@ -272,21 +284,22 @@ namespace AGV_BackgroundTask
                                 // Przypadek gdy przełącznik "Funkcja alarmowa IPOINTA" jest przełączony i AGV nie będzi epodejmował działań- tylko SERWIS.
                                 else
                                 {
-                                    var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_Odbiór pełnej palety AUTO ", Details = machine.PalletType.ToString(), Priority = 0 };
+                                    var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "SERVICE_Odbiór pełnej palety AUTO IPOINT Awaria ", Details = machine.PalletType.ToString(), Priority = 0 };
                                     // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV i dla Serwisu.
                                     foreach (var task in ServiceTasks)
                                     { 
                                         if (task.machineNumber == sBodySerwice.MachineNumber)
                                         {
                                             //Sprawdzenie czy task istnieje już na tablecie serwisanta.
-                                            if (task.name.Contains("Odbór"))
+                                            if (task.name.Contains("SERVICE_Odbiór"))
                                             {
                                                 SERVICE_TaskExist = true;
                                             }
                                         }
- 
-                                        // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
-                                        foreach (var task2 in Program.tasks_pozagv02)
+                                    //Zamknięcie forecha w tym miejscu  a nie za foreachem dla zadań AGV do sprawdzenia.
+                                    }
+                                    // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
+                                    foreach (var task2 in Program.tasks_pozagv02)
                                         {
                                             if (!(task2.MissionType == "Wait" || task2.MissionType == "Manual"))
                                             {
@@ -300,14 +313,39 @@ namespace AGV_BackgroundTask
                                             
                                         }
 
-                                    }
+                                    
                                     if(SERVICE_TaskExist == false)
-                                    { 
-                                    // Zadanie dla SERWISU 
+                                    {
+                                        //Dodane 15_10_2024
+                                        //Kasowanie palety w momencie gdy zadanie dla serwisu
+                                        // Do sprawdzenia
+                                        PalletLoad SourcePallet = await GetLoads_pozagv02.Get(MissionPickupId);
+                                        if (SourcePallet.Loads.Count > 0)
+                                        {
+                                            foreach (var pallets in SourcePallet.Loads){
+
+                                                var palletAllObj = new ResourceAtLocation()
+                                                {
+                                                    symbolicPointId = MissionPickupId,
+                                                    resourceType = pallets.TypeId,
+                                                    amount = 0,
+                                                    shelfId = pallets.ShelfId
+                                                };
+                                                try
+                                                {
+                                                    CreatePallet_pozagv02.SetResourses(palletAllObj);
+                                                }
+                                                catch
+                                                {
+                                                    Console.WriteLine("Błąd przy próbie skasowania palety gdy serwis ma przejąć zadania AGV z paletyzerów. Błą dal punktu " + MissionPickupId);
+                                                }
+                                            }
+                                        }
+                                        // Zadanie dla SERWISU 
                                         var response = await CreateTask_pozmda02.POST(sBodySerwice);
                                         if (response.IsSuccessStatusCode)
                                         {
-                                            Console.WriteLine($"Utworzono zadanie dla SERWISU dla maszyny {machine.Name}. | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
+                                            Console.WriteLine($"IPOINT AWARIA - Przekierowano zadanie dla SERWISU dla maszyny {machine.Name}. | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
                                         }
                                     }
                                 }

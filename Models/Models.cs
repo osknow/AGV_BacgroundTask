@@ -18,7 +18,24 @@ namespace AGV_BackgroundTask
         AngChep = 3910025
 
     }
+    public class PalletLoad
+    {
+        public int TargetId { get; set; }
+        public string RackId { get; set; }
+        public int LoadCount { get; set; }
+        public List<Load> Loads { get; set; }
 
+    }
+    public class Load
+    {
+        public int TypeId { get; set; }
+        public int Quantity { get; set; }
+        public int ShelfId { get; set; }
+        public string Side { get; set; }
+        public string Barcode { get; set; }
+        public int LoadId { get; set; }
+        public int Slot { get; set; }
+    }
     public class ResourceAtLocation
     {
         public int symbolicPointId { get; set; }
