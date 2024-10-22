@@ -87,6 +87,8 @@ namespace AGV_BackgroundTask
             int MissionDropoffId = 0;
             int MissionDropoffShelfId = 0;
             int MissionDropoffRequiredLoadType = 0;
+            bool taskAgvExist = false;
+            string externalId = "";
             foreach (var item in OPCNode )
             {
                 foreach (var agv_machine in AGV_MatrixModel)
@@ -165,9 +167,17 @@ namespace AGV_BackgroundTask
                                         if(! (task.MissionType == "Wait" || task.MissionType == "Manual" || task.MissionType == "Charge"))
                                         { 
                                             var finalTargetId = task.FinalTarget.Split(" ");
-                                            if (finalTargetId[1] == "4001" && task.Steps[0].CurrentTarget.Contains(agv_machine.pick))
+                                            if (task.FinalTarget.Contains("4001") && task.Steps[0].CurrentTarget.Contains(agv_machine.pick) && (! (task.Steps[0].StepStatus == "Complete")))
                                             {
                                                 AGV_TaskExist = true;   
+                                            }
+                                            //
+                                            // Zarejestrowanie przypadku że druga paleta z paletyzera wyjeżdza w czasie trwania zadania poprzednego odbioru palety .
+                                            // System Navitec AGV nie może mieć dwóch zadań o tej samej nazwie.
+                                            //
+                                            if (task.FinalTarget.Contains("4001") && task.Steps[0].CurrentTarget.Contains(agv_machine.pick) && (task.Steps[0].StepStatus == "Complete"))
+                                            {
+                                                taskAgvExist = true;
                                             }
                                         }
                                     }
@@ -177,7 +187,11 @@ namespace AGV_BackgroundTask
                                     {
                                         if (task.machineNumber == item.MachineName)
                                         {
-                                            if (task.name.Contains("SERVICE_Odbiór"))
+                                            if (task.name.Contains("SERVICE_Odbiór pełnej palety"))
+                                            {
+                                                AGV_TaskExist = true;
+                                            }
+                                            else if (task.name.Contains("SERVICE_Paleta na blokadę"))
                                             {
                                                 AGV_TaskExist = true;
                                             }
@@ -207,11 +221,18 @@ namespace AGV_BackgroundTask
                                         // Tworzenie zadania
                                         try {
                                             #region MissionBody
-
+                                            if (taskAgvExist)
+                                            {
+                                                externalId = "Zadanie PALL Pick 2: " + item.MachineName;
+                                            }
+                                            else
+                                            {
+                                                externalId = "Zadanie PALL Pick: " + item.MachineName;
+                                            }
                                             //
                                             var sBodyMissinsAGV = new
                                             {
-                                                ExternalId = "Zadanie PALL Pick: "+item.MachineName,
+                                                ExternalId = externalId,
                                                 Name = "DUNI_TASK_AGV",
                                                 Options = new
                                                 {
@@ -291,9 +312,13 @@ namespace AGV_BackgroundTask
                                         if (task.machineNumber == sBodySerwice.MachineNumber)
                                         {
                                             //Sprawdzenie czy task istnieje już na tablecie serwisanta.
-                                            if (task.name.Contains("SERVICE_Odbiór"))
+                                            if (task.name.Contains("SERVICE_Odbiór pełnej palety"))
                                             {
                                                 SERVICE_TaskExist = true;
+                                            }
+                                            else if (task.name.Contains("SERVICE_Paleta na blokadę"))
+                                            {
+                                                AGV_TaskExist = true;
                                             }
                                         }
                                     //Zamknięcie forecha w tym miejscu  a nie za foreachem dla zadań AGV do sprawdzenia.
@@ -305,7 +330,7 @@ namespace AGV_BackgroundTask
                                             {
                                                 //
                                                 var finalTargetId = task2.FinalTarget.Split(" ");
-                                                if (finalTargetId[1] == "4001" && task2.Steps[0].CurrentTarget.Contains(agv_machine.pick))
+                                                if (task2.FinalTarget.Contains("4001") && task2.Steps[0].CurrentTarget.Contains(agv_machine.pick) && (!(task2.Steps[0].StepStatus == "Complete")))
                                                 {
                                                     SERVICE_TaskExist = true;
                                                 }  
@@ -365,9 +390,13 @@ namespace AGV_BackgroundTask
                                 {
                                     if (task.machineNumber == sBodySerwice.MachineNumber)
                                     {
-                                        if (task.name.Contains("Odbiór"))
+                                        if (task.name.Contains("SERVICE_Odbiór pełnej palety"))
                                         {
                                             SERVICE_TaskExist = true;
+                                        }
+                                        else if (task.name.Contains("SERVICE_Paleta na blokadę"))
+                                        {
+                                            AGV_TaskExist = true;
                                         }
                                     }
                                 }
