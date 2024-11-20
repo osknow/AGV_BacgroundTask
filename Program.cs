@@ -297,7 +297,9 @@ namespace AGV_BackgroundTask
                             //
                             // Aktualizacja zadania o status "W trakcie"
                             //
-                            await ChangeTaskStatusByAGV(1, item_pozagv02_Id_String);
+                            if(item_pozmda01.loginTime == "0001-01-01T00:00:00") { 
+                                await ChangeTaskStatusByAGV(1, item_pozagv02_Id_String);
+                            }
                             //Sprawdzenie ilośći kroków do wykonania w danym zadaniu
                             int length = item_pozagv02.Steps.Count;
                             // 
@@ -319,7 +321,10 @@ namespace AGV_BackgroundTask
                                         //Krok 2 nie zostanie zasygnalizoway ponieważ zadanie znika z listy gdy wykona się osatni krok zadania.
                                         //Tak więc gdy kroków w zadaniu będzie 3 lub więcej wtedy wszystkie do ostatniego będą sygnalizowane.
                                         //
-                                        await ChangeTaskStatusByAGV(2, item_pozagv02_Id_String);
+                                        if (item_pozmda01.joinedTime == "0001-01-01T00:00:00")
+                                        {
+                                            await ChangeTaskStatusByAGV(2, item_pozagv02_Id_String);
+                                        }
                                     }
 
                                 }

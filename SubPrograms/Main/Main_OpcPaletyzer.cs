@@ -73,8 +73,10 @@ namespace AGV_BackgroundTask
             var AGV_MatrixModel =  await ReadAGVMatrix.GetMachineMatrixFromPOZMDA();
             //Read OPC signals from Paletizers
             OPC_ReadData();
-            //Read Service tasks on pozmda01 server
+            //Read Service tasks from pozmda02 Server
             List<GetCurrentTask> ServiceTasks = await GetMissions_pozmda02.SERVICE();
+            //Read AGV tasks from pozmda02 Server
+            List<GetCurrentTask> AgvTasks = await GetMissions_pozmda02.AGV();
             //Read PaletType on Machines
             var Machines = await ReadMachines.GetMachinesFromPOZMDA();
             //Current tasks from pozagv02
@@ -181,7 +183,6 @@ namespace AGV_BackgroundTask
                                             }
                                         }
                                     }
-                                    // Dodane 15_10_2024
                                     // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla Serwice.
                                     foreach (var task in ServiceTasks)
                                     {
@@ -197,7 +198,8 @@ namespace AGV_BackgroundTask
                                             }
                                         }
                                     }
-                                        if (AGV_TaskExist == false)
+                                    //
+                                    if (AGV_TaskExist == false)
                                     {
                                         //Tworzenie palety dla systemu AGV
                                         if (sBodySerwiceAGV.targetLocation.Contains("4001") && SERVICE_TaskExist == false)
@@ -283,22 +285,24 @@ namespace AGV_BackgroundTask
                                             #endregion
                                             //
                                             responseAGV = await CreateMission_pozagv02.POST(sBodyMissinsAGV);
-                                        
+                                            if (responseAGV.IsSuccessStatusCode)
+                                            {
+                                                OPC_WriteData(item.OpcNode_FullPaletPick);
+                                            }
+                                            
                                         }
                                         catch
                                         {
                                             Console.WriteLine("Błąd przy stworzeniu zadania z punktu: " + sBodySerwiceAGV.pickupLocation +" do punktu: "+ sBodySerwiceAGV.targetLocation);
                                         }
                                         //
-                                         
                                         if (responseAGV.IsSuccessStatusCode && CreateMission_pozagv02.responseJSON.Success)
                                         {
                                             Console.WriteLine($"Utworzono zadanie AGV dla maszyny {machine.Name} z Id: {CreateMission_pozagv02.responseJSON.InternalId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
                                             // Zadanie na serwer POZMDA01
                                             var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Odbiór pełnej palety_AUTO " + machine.PalletType.ToString(), Details = $"{ CreateMission_pozagv02.responseJSON.InternalId}", Priority = 0 };
-                                            var response = await CreateTask_pozmda02.POST(sBodySerwice);
-                                        }
-                                        
+                                            var response = await CreateTask_pozmda02.POST(sBodySerwice); 
+                                        }  
                                     }
                                 }
                                 // Komórka w MachineMatrix PUSTA: zadanie z automatu do seriwsu. 
@@ -407,6 +411,7 @@ namespace AGV_BackgroundTask
                                     var response = await CreateTask_pozmda02.POST(sBodySerwice);
                                     if (response.IsSuccessStatusCode)
                                     {
+                                        OPC_WriteData(item.OpcNode_FullPaletPick);
                                         Console.WriteLine($"Utworzono zadanie dla SERWISU dla maszyny {machine.Name}.  | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
                                     }
                                 }
@@ -606,9 +611,38 @@ namespace AGV_BackgroundTask
             }
             
         }
+        static async Task OPC_WriteData( string node)
+        {
+            foreach (var item in OPCNode)
+            {
+                try
+                {
+                    //Paletyzers REQUEST Signals 
+                    //
+                    var opc_client = new OpcClient("opc.tcp://POZOPC01:5023/Softing_dataFEED_OPC_Suite_POZOPC_AGV");
+                    //
+                    opc_client.Connect();
+                    //
+                    var FullPalletToPick = opc_client.WriteNode(node, false);
+                    //
+                    Thread.Sleep(100);
+                    //
+                    opc_client.Disconnect();
+                    //
+                }
+                catch (Exception e)
+                {
+
+                    Console.WriteLine($"Problem with machine: {item.MachineName} // Type: {0}. Message : {1}", e.GetType(), e.Message);
+                    Console.WriteLine(e);
+                }
+
+            }
+
+        }
 
 
-        
+
     }
 
 }
