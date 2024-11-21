@@ -374,6 +374,8 @@ namespace AGV_BackgroundTask
                                         var response = await CreateTask_pozmda02.POST(sBodySerwice);
                                         if (response.IsSuccessStatusCode)
                                         {
+
+                                            OPC_WriteData(item.OpcNode_FullPaletPick);
                                             Console.WriteLine($"IPOINT AWARIA - Przekierowano zadanie dla SERWISU dla maszyny {machine.Name}. | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
                                         }
                                     }
