@@ -55,11 +55,11 @@ namespace AGV_BackgroundTask
                 client.Connect();
                 //
                 //var Place_status = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Place_1 Free");
-                var E_Stop = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.OWIJARKA E-STOP");
-                var Alarm = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.OWIJARKA BLAD");
-                var SafetyRelay = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.OWIJARKA Obwod Bezpieczenstwa");
-                var EndOfMaterial = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.OWIJARKA koniec foli");
-                var TimeOfPalletOnEntrance = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Place_1_CzasPostoju");
+                var E_Stop = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Alarmy_Owijarka.OWIJARKA E-STOP");
+                var Alarm = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Alarmy_Owijarka.OWIJARKA BLAD");
+                var SafetyRelay = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Alarmy_Owijarka.OWIJARKA Obwod Bezpieczenstwa");
+                var EndOfMaterial = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Alarmy_Owijarka.OWIJARKA koniec foli");
+                var TimeOfPalletOnEntrance = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.IPOINT_Wjazd.Place_1_CzasPostoju");
                 // FREE     : TRUE
                 // OCUPATED : FALSE
                 //bool status = Convert.ToBoolean(Place_status.Value);

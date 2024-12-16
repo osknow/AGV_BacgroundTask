@@ -91,6 +91,8 @@ namespace AGV_BackgroundTask
             int MissionDropoffRequiredLoadType = 0;
             bool taskAgvExist = false;
             string externalId = "";
+            string taskExistTextAdditional = "";
+            //
             foreach (var item in OPCNode )
             {
                 foreach (var agv_machine in AGV_MatrixModel)
@@ -222,20 +224,23 @@ namespace AGV_BackgroundTask
                                         HttpResponseMessage responseAGV=new HttpResponseMessage();
                                         // Tworzenie zadania
                                         try {
+                                            
                                             #region MissionBody
                                             if (taskAgvExist)
                                             {
                                                 externalId = "Zadanie PALL Pick 2: " + item.MachineName;
+                                                taskExistTextAdditional = "2";
                                             }
                                             else
                                             {
                                                 externalId = "Zadanie PALL Pick: " + item.MachineName;
+                                                taskExistTextAdditional = "1";
                                             }
                                             //
                                             var sBodyMissinsAGV = new
                                             {
                                                 ExternalId = externalId,
-                                                Name = "DUNI_TASK_AGV",
+                                                Name = "DUNI_TASK AGV "+ taskExistTextAdditional + " " + item.MachineName,
                                                 Options = new
                                                 {
                                                     Priority = 4
@@ -298,7 +303,7 @@ namespace AGV_BackgroundTask
                                         //
                                         if (responseAGV.IsSuccessStatusCode && CreateMission_pozagv02.responseJSON.Success)
                                         {
-                                            Console.WriteLine($"Utworzono zadanie AGV dla maszyny {machine.Name} z Id: {CreateMission_pozagv02.responseJSON.InternalId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
+                                            Console.WriteLine($" Utworzono zadanie {taskExistTextAdditional} dla AGV - maszyna {machine.Name} z Id: {CreateMission_pozagv02.responseJSON.InternalId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
                                             // Zadanie na serwer POZMDA01
                                             var sBodySerwice = new CreateTaskPozmda01_sBody() { MachineNumber = $"{item.MachineName}", Name = "AGV_Odbiór pełnej palety_AUTO " + machine.PalletType.ToString(), Details = $"{ CreateMission_pozagv02.responseJSON.InternalId}", Priority = 0 };
                                             var response = await CreateTask_pozmda02.POST(sBodySerwice); 
@@ -362,6 +367,7 @@ namespace AGV_BackgroundTask
                                                 };
                                                 try
                                                 {
+                                                    //Reset pallet.
                                                     CreatePallet_pozagv02.SetResourses(palletAllObj);
                                                 }
                                                 catch
