@@ -26,21 +26,16 @@ namespace AGV_BackgroundTask
             bool ststusPozagv02 = await IPOINT_Sequencer();
             if (ststusPozagv02)
             {
-                //____________________________________________
-                // TO DELETE !!!!            
-                await SetResourses();
-                //____________________________________________
                 // Funkcja aktualizująca zadania przetwarzane przez system AGV.
                 await DuniTaskAGV();
             }
             await Main_OpcPaletyzer.SubMain_AGV_Tasks();
+
+
+
             Console.WriteLine("Koniec : " + DateTime.Now);
         }
- 
-        //**************
-        // Miejsce zarządzania sekwencją na podstawie zajętośći miejca IPOINT
         //
-        //**************
         static async Task<bool> IPOINT_Sequencer()
         {
             //bool status_out = false;
@@ -79,34 +74,7 @@ namespace AGV_BackgroundTask
                 Console.WriteLine($"Error:  Błąd odczytania bazy danych OPC.");
                 throw;
             }
-            #region ToDelete
-            //if (status_out == true)
-            //{
-            //    //ResourceAtLocation_Euro();
-            //    //Thread.Sleep(100);
-            //    try { 
-            //    HttpResponseMessage response = await IPOINT_Resourse_pozagv02.ResetPallet();
-            //    }
-            //    catch(Exception e)
-            //    {
-            //        // Błąd komunikacji.
-            //        return false;
-            //    }
 
-            //}
-            //else
-            //{
-            //    //Miejsce zajęte - zablokować oba miejca dla czytelnośći że zrobił to bacground Task.
-            //    try
-            //    {
-            //        await IPOINT_Resourse_pozagv02.SetPallet();
-            //    }
-            //    catch
-            //    {
-            //        return false;
-            //    }
-            //}
-            #endregion
             //
             //Sprawdzenie czasu postoju palety na miejscu odkładczym IPOINT i ustwaiie alarmuw moemncie przekroczenia czasu z założonym.
             //
@@ -133,10 +101,10 @@ namespace AGV_BackgroundTask
             {
                 // Nic nie rób - blokada działania funkcji
             }
-            else if(status_TimeOfPalletOnEntrance >= IpointStatus.Setup_IPOINT_EmailPaletNotPickedTime && (IpointStatus.Email_Sended == false))
+            else if (status_TimeOfPalletOnEntrance >= IpointStatus.Setup_IPOINT_EmailPaletNotPickedTime && (IpointStatus.Email_Sended == false))
             {
-                    SendEmail_pozmda02.ToWarehouse();
-                    IpointStatus.Email_Sended = true;
+                SendEmail_pozmda02.ToWarehouse();
+                IpointStatus.Email_Sended = true;
             }
             else if ((status_TimeOfPalletOnEntrance < IpointStatus.Setup_IPOINT_EmailPaletNotPickedTime) && (IpointStatus.Email_Sended == true))
             {
@@ -148,105 +116,20 @@ namespace AGV_BackgroundTask
             IpointStatus.EndOfMaterial = status_EndOfMaterial;
             IpointStatus.SafetyRelay = status_SafetyRelay;
             IpointStatus.UpdatedTime = DateTime.Now;
-            IpointStatus.UpdatedTime = DateTime.Now;
             IpointStatus.Real_PaletNotPickedTime = status_TimeOfPalletOnEntrance;
-
+            //
             try { 
-            await PostSubMachines_pozmda02.PostMachinesToPOZMDA(SubMachines[0]);
+                //
+                await PostSubMachines_pozmda02.PostMachinesToPOZMDA(IpointStatus);
             }
             catch
             {
+                Console.WriteLine("Error:  Błąd podczas aktualizacji danych o IPOINT");
                 return false;
             }
             return true;
         }
-
- 
-        static async Task SetResourses()
-        {
-            using (var client = new HttpClient())
-            {
-                var url_ResourcesAtLocation = "https://pozagv02.duni.org:1234/api/ResourceAtLocation";
-                var url_LoadAtLocation = "https://pozagv02.duni.org:1234/api/LoadAtLocation";
-
-                var jsonserialize = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-                client.DefaultRequestHeaders.Add("ApiKey", "C1XUN3agvZ9P2ER");
-                client.DefaultRequestHeaders.Add("Content", "application/json");
-                //
-                #region Ustawianie Palet W starych Stosach 
-                //
-                //var PSM_038_ENG = new ResourceAtLocation()
-                //{
-                //    symbolicPointId = 3001,
-                //    resourceType = 2,
-                //    amount = 8,
-                //    shelfId = -1
-                //};
-                //var PSM_054_PALL = new ResourceAtLocation()
-                //{
-                //    symbolicPointId = 2001,
-                //    resourceType = 4,
-                //    amount = 8,
-                //    shelfId = -1
-                //}; ;
-
-                //var response_2 = await client.PostAsJsonAsync(url_ResourcesAtLocation, PSM_038_ENG);
-
-
-                //if (response_2.IsSuccessStatusCode)
-                //{
-                //    string responseString = await response_2.Content.ReadAsStringAsync();
-                //}
-                //else
-                //{
-                //    Console.WriteLine($"{response_2.StatusCode} , {response_2.RequestMessage}");
-                //}
-
-                //var response_3 = await client.PostAsJsonAsync(url_ResourcesAtLocation, PSM_054_PALL);
-
-
-                //if (response_3.IsSuccessStatusCode)
-                //{
-                //    string responseString = await response_3.Content.ReadAsStringAsync();
-                //}
-                //else
-                //{
-                //    Console.WriteLine($"{response_3.StatusCode} , {response_3.RequestMessage}");
-                //}
-                #endregion
-            }
-        }
-        
-        
         //
-        //DUNI TAKS AGV
-        //
-  
-        
-        static async Task ChangeTaskStatusByAGV(int status , string duniTaskDetails)
-        {
-            var url = $"https://pozmda02.duni.org/api/DuniTasks/changeTaskStatusByAGV/{status}/{duniTaskDetails}";
-            // LINK:
-            //pozmda01.duni.org:81//api/DuniTasks/changeTaskStatusByAGV/{status}/{duniTaskDetails}"
-
-            using (var client = new HttpClient())
-            {
-                try
-                {
-                     HttpResponseMessage response = await client.GetAsync(url);
-
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine(response.StatusCode+" | "+"Zadanie: "+ duniTaskDetails + " zaktualizowane o status: " + status+".");
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw;
-                }
-            }
-        }
         static async Task DuniTaskAGV()
         {
             // Lista zadań AGV z pozagv02
@@ -281,7 +164,7 @@ namespace AGV_BackgroundTask
                         //Kończenie zadań otwartych 
                         if (output_status==false)
                         {
-                            await ChangeTaskStatusByAGV(3, item_pozmda01.details);
+                            await ChangeTaskStatusByAGV_pozmda02.Update(3, item_pozmda01.details);
                             DateTime Time = DateTime.Now;
                             Console.WriteLine($"Zadanie: {item_pozmda01.details} skasowane poprawnie.");
                         }
@@ -300,7 +183,7 @@ namespace AGV_BackgroundTask
                             // Aktualizacja zadania o status "W trakcie"
                             //
                             if(item_pozmda01.loginTime == "0001-01-01T00:00:00") { 
-                                await ChangeTaskStatusByAGV(1, item_pozagv02_Id_String);
+                                await ChangeTaskStatusByAGV_pozmda02.Update(1, item_pozagv02_Id_String);
                             }
                             //Sprawdzenie ilośći kroków do wykonania w danym zadaniu
                             int length = item_pozagv02.Steps.Count;
@@ -325,7 +208,7 @@ namespace AGV_BackgroundTask
                                         //
                                         if (item_pozmda01.joinedTime == "0001-01-01T00:00:00")
                                         {
-                                            await ChangeTaskStatusByAGV(2, item_pozagv02_Id_String);
+                                            await ChangeTaskStatusByAGV_pozmda02.Update(2, item_pozagv02_Id_String);
                                         }
                                     }
 
@@ -342,7 +225,7 @@ namespace AGV_BackgroundTask
 
 
         // *************************************************************
-        // Funkcja do kasowania WSZYSTKICH zadań 
+        #region Funkcja do kasowania WSZYSTKICH zadań AGV na pozmda02
         // UWAGA
         // NIE UŻYWAĆ !!
         static async Task ClearAllPos()
@@ -350,9 +233,10 @@ namespace AGV_BackgroundTask
             List<GetCurrentTask> tasksNew_pozmda01 = await GetMissions_pozmda02.AGV();
             foreach(var obj in tasksNew_pozmda01)
             {
-                await ChangeTaskStatusByAGV(3, obj.details);
+                await ChangeTaskStatusByAGV_pozmda02.Update(3, obj.details);
             }
         }
         // *************************************************************
+        #endregion
     }
 }
