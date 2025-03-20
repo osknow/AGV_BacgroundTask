@@ -26,10 +26,12 @@ namespace AGV_BackgroundTask
             bool ststusPozagv02 = await IPOINT_Sequencer();
             if (ststusPozagv02)
             {
-                        
-            await SetResourses();
-            // Funkcja aktualizująca zadania przetwarzane przez system AGV.
-            await DuniTaskAGV();
+                //____________________________________________
+                // TO DELETE !!!!            
+                await SetResourses();
+                //____________________________________________
+                // Funkcja aktualizująca zadania przetwarzane przez system AGV.
+                await DuniTaskAGV();
             }
             await Main_OpcPaletyzer.SubMain_AGV_Tasks();
             Console.WriteLine("Koniec : " + DateTime.Now);
