@@ -46,6 +46,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Error: Błąd podczas ustawienia palety w punkcie IPOINTA.");
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }
@@ -92,6 +94,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Error: Błąd podczas resetu palety w punkcie IPOINTA.");
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }

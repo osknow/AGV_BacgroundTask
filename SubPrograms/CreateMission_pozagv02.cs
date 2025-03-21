@@ -29,6 +29,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (HttpRequestException e)
                 {
+                    Console.WriteLine("Error: Błąd podczas tworzenia misji dla maszyny o ciele (Body) : "+ body);
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }

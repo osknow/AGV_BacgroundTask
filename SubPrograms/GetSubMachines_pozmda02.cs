@@ -22,9 +22,10 @@ namespace AGV_BackgroundTask.SubPrograms
                      
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
+                Console.WriteLine("Error: Pobranie SUBMachines z pozmda02.");
+                Console.WriteLine(e.Message);
                 throw;
             }
         }

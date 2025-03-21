@@ -23,6 +23,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (HttpRequestException e)
                 {
+                    Console.WriteLine("Error: Błąd podczas odczytu Machines z pozmda02.");
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }

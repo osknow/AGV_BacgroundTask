@@ -29,6 +29,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Error: Błąd podczas odczytu ładunku dla punktu " + id);
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }

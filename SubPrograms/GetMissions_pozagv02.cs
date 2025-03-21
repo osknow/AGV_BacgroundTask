@@ -31,6 +31,7 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Error: Błąd podczas pobrania misji z serwera pozagv02.");
                     throw;
                 }
             }

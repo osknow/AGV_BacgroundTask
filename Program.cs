@@ -122,9 +122,10 @@ namespace AGV_BackgroundTask
                 //
                 await PostSubMachines_pozmda02.PostMachinesToPOZMDA(IpointStatus);
             }
-            catch
+            catch(Exception e)
             {
                 Console.WriteLine("Error:  Błąd podczas aktualizacji danych o IPOINT");
+                Console.WriteLine(e.Message);
                 return false;
             }
             return true;

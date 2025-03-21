@@ -22,7 +22,7 @@ namespace AGV_BackgroundTask.SubPrograms
                 client.DefaultRequestHeaders.Add("ApiKey", "C1XUN3agvZ9P2ER");
                 client.DefaultRequestHeaders.Add("Content", "application/json");
 
-
+                try { 
                 var response = await client.PostAsJsonAsync(url_ResourcesAtLocation, data);
 
                 if (response.IsSuccessStatusCode)
@@ -35,6 +35,13 @@ namespace AGV_BackgroundTask.SubPrograms
                 else
                 {
                     Console.WriteLine($"{response.StatusCode} , {response.RequestMessage}");
+                }
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error: Bład podczas próby ustawielnia palety w punkcie dla Id: "+data.symbolicPointId );
+                    Console.WriteLine(e.Message);
+                    throw;
                 }
 
             }

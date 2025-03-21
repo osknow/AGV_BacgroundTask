@@ -20,10 +20,11 @@ namespace AGV_BackgroundTask.SubPrograms
                     return  await client.GetAsync(HttpSerwerURI);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
-                throw;
+                Console.WriteLine("Error: Błąd podczas próby wysłania maila do Warechouse");
+                Console.WriteLine(e.Message);
+                return null;
             }
         }
     }

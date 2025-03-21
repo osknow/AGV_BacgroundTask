@@ -22,9 +22,10 @@ namespace AGV_BackgroundTask.SubPrograms
                     return response;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
+                Console.WriteLine("Error: Błąd podzas aktualizacji danych o IPOINCIE. ");
+                Console.WriteLine(e.Message);
                 throw;
             }
         }

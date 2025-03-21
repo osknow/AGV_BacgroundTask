@@ -23,6 +23,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Error: Bład podczas próby pobrania danych zadań z pozmda02 dla AGV");
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }
@@ -40,6 +42,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Error: Bład podczas próby pobrania danych zadań z pozmda02 dla SERVICE");
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }

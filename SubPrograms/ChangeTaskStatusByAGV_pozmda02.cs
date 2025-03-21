@@ -29,6 +29,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine("Error:  Błąd podczas aktualizacji statusu zadania "+duniTaskDetails + "na status "+ status );
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }

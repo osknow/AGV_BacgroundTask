@@ -23,6 +23,8 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 catch (HttpRequestException e)
                 {
+                    Console.WriteLine("Error: Błąd podczas tworzenia zadania na serwer pozmda02 dla maszyny: "+ body.MachineNumber);
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }

@@ -26,8 +26,10 @@ namespace AGV_BackgroundTask.SubPrograms
                     responseJSON = JsonConvert.DeserializeObject<TaskPozagv02_sBodyResponse>(outbody);
                     return response;
                 }
-                catch (HttpRequestException e)
+                catch (Exception e)
                 {
+                    Console.WriteLine("Error: Błąd podczas tworzenia zadania NIE misji dla ID z :" + body.pickupLocation + "do :" + body.targetLocation);
+                    Console.WriteLine(e.Message);
                     throw;
                 }
             }
