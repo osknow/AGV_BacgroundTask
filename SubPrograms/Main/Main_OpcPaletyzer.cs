@@ -298,15 +298,14 @@ namespace AGV_BackgroundTask
                                                     }
                                                         }
                                                 };
-
                                                 #endregion
                                                 //
                                                 responseAGV = await CreateMission_pozagv02.POST(sBodyMissinsAGV);
-                                                if (responseAGV.IsSuccessStatusCode)
+                                                //
+                                                if (responseAGV.IsSuccessStatusCode && CreateMission_pozagv02.responseJSON.Success)
                                                 {
                                                     OPC_WriteData(item.OpcNode_FullPaletPick);
                                                 }
-
                                             }
                                             catch
                                             {
@@ -401,10 +400,8 @@ namespace AGV_BackgroundTask
                                     }
                                     //
                                     AGV_TaskExist = false;
-                                    SERVICE_TaskExist = false;
-
-
-
+                                    SERVICE_TaskExist = false; 
+                                    taskAgvExist = false;
                                 }
                                 //SERVICE Full
                                 else if (item.REQ_FullPaletPick && (!agv_machine.pickActive))
