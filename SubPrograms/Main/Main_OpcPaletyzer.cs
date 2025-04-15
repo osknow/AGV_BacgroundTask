@@ -77,6 +77,14 @@ namespace AGV_BackgroundTask
             // Dodane do przetestowania.
             // Sprawdzenie czy jest jakikolwiek request z maszyny o palecie.
             //
+            //_____________________________________________________________________________________________________________________________
+            //TEMP Console log do diagnostyki
+            foreach(var item in OPCNode)
+            {
+                Console.WriteLine("Stan sygnału odbioru pełnej palety z maszyny: "+ item.MachineName + " to: "+item.REQ_FullPaletPick);
+            }
+            //_____________________________________________________________________________________________________________________________
+            //
             bool anyPaletToWork = OPCNode.Any(node => node.REQ_FullPaletPick || node.REQ_EmptyPaletsDrop);
             //
             if (anyPaletToWork)
@@ -634,7 +642,6 @@ namespace AGV_BackgroundTask
         }
         static async Task OPC_WriteData( string node)
         {
-
                 try
                 {
                     //Paletyzers REQUEST Signals 
@@ -646,7 +653,12 @@ namespace AGV_BackgroundTask
                     var FullPalletToPick = opc_client.WriteNode(node, false);
                     //
                     //Thread.Sleep(100);
-                    //
+                    Console.WriteLine("Odpowiedz po wysłaniu żądania resetu OPC na node: "+ node +" |  Status IsGood : "+ FullPalletToPick.IsGood + ", Status isBad: "+ FullPalletToPick.IsBad);
+                //
+                if (FullPalletToPick.IsBad)
+                {
+                    Console.WriteLine("Opis błędu: " + FullPalletToPick.Description);
+                }
                     opc_client.Disconnect();
                     //
                 }

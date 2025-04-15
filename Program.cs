@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AGV_BackgroundTask
@@ -18,22 +19,35 @@ namespace AGV_BackgroundTask
             //
 #if !DEBUG
       
-            Console.SetOut(new MyLoger("W:\\BackgroundTasks\\AGV\\logs"));
+            Console.SetOut(new MyLoger("W:\\BackgroundTasks\\AGV\\logs_TEMP"));
 #endif
-
-            Console.WriteLine("Początek : " + DateTime.Now);
-            //Status mówi o tym czy działa komunikacja z serwerem pozagv02.
-            bool ststusPozagv02 = await IPOINT_Sequencer();
-            if (ststusPozagv02)
+            int milisecoundsWhileSleep = 10000;
+            int averageTimeOfPrograms = 4000;
+            #region Mathematic Loop While 
+            int taskEveryMinutes = 60;
+            DateTime startTime = DateTime.Now;
+            decimal countLoopWhlie = taskEveryMinutes / (milisecoundsWhileSleep / 1000);
+            countLoopWhlie = Math.Floor(countLoopWhlie);
+            int i = 0;
+            #endregion
+            while (i< countLoopWhlie)
             {
+
+                Console.WriteLine("Początek : " + DateTime.Now);
+                //Status mówi o tym czy działa komunikacja z serwerem pozagv02.
+                bool ststusPozagv02 = await IPOINT_Sequencer();
+
+                await Main_OpcPaletyzer.SubMain_AGV_Tasks();
                 // Funkcja aktualizująca zadania przetwarzane przez system AGV.
                 await DuniTaskAGV();
+                i++;
+                Console.WriteLine("Koniec : " + DateTime.Now);
+
+                if (DateTime.Now >= startTime.AddMinutes(1).AddMilliseconds(-(milisecoundsWhileSleep + averageTimeOfPrograms))){
+                    break;
+                }
+                Thread.Sleep(milisecoundsWhileSleep);
             }
-            await Main_OpcPaletyzer.SubMain_AGV_Tasks();
-
-
-
-            Console.WriteLine("Koniec : " + DateTime.Now);
         }
         //
         static async Task<bool> IPOINT_Sequencer()
