@@ -183,25 +183,28 @@ namespace AGV_BackgroundTask
                                     // Sprawdzenie czy komórka w MachineMatrix NIE jest pusta: jeśli tak to zadanie z automatu do seriwsu. 
                                     if (!(sBodySerwiceAGV.targetLocation == null || sBodySerwiceAGV.pickupLocation == null))
                                     {
-                                        // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.
-                                        foreach (var task in Program.tasks_pozagv02)
-                                        {
-                                            if (!(task.MissionType == "Wait" || task.MissionType == "Manual" || task.MissionType == "Charge"))
+
+                                        // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla AGV.'
+                                        if (! (Program.tasks_pozagv02 is null)) { 
+                                           foreach (var task in Program.tasks_pozagv02)
                                             {
-                                                var finalTargetId = task.FinalTarget.Split(" ");
-                                                if (task.FinalTarget.Contains("4001") && task.Steps[0].CurrentTarget.Contains(agv_machine.pick) && (!(task.Steps[0].StepStatus == "Complete")))
+                                                if (!(task.MissionType == "Wait" || task.MissionType == "Manual" || task.MissionType == "Charge"))
                                                 {
-                                                    AGV_TaskExist = true;
+                                                    var finalTargetId = task.FinalTarget.Split(" ");
+                                                    if (task.FinalTarget.Contains("4001") && task.Steps[0].CurrentTarget.Contains(agv_machine.pick) && (!(task.Steps[0].StepStatus == "Complete")))
+                                                    {
+                                                        AGV_TaskExist = true;
+                                                    }
+                                                    //
+                                                    // Zarejestrowanie przypadku że druga paleta z paletyzera wyjeżdza w czasie trwania zadania poprzednego odbioru palety .
+                                                    // System Navitec AGV nie może mieć dwóch zadań o tej samej nazwie.
+                                                    //
+                                                    if (task.FinalTarget.Contains("4001") && task.Steps[0].CurrentTarget.Contains(agv_machine.pick) && (task.Steps[0].StepStatus == "Complete"))
+                                                    {
+                                                        taskAgvExist = true;
+                                                    }
                                                 }
-                                                //
-                                                // Zarejestrowanie przypadku że druga paleta z paletyzera wyjeżdza w czasie trwania zadania poprzednego odbioru palety .
-                                                // System Navitec AGV nie może mieć dwóch zadań o tej samej nazwie.
-                                                //
-                                                if (task.FinalTarget.Contains("4001") && task.Steps[0].CurrentTarget.Contains(agv_machine.pick) && (task.Steps[0].StepStatus == "Complete"))
-                                                {
-                                                    taskAgvExist = true;
-                                                }
-                                            }
+                                            } 
                                         }
                                         // Sprawdzenie czy zadanie już nie występuje na liście zadań do wykonania dla Serwice.
                                         foreach (var task in ServiceTasks)
