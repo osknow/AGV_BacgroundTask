@@ -19,7 +19,7 @@ namespace AGV_BackgroundTask
             //
 #if !DEBUG
       
-            Console.SetOut(new MyLoger("W:\\BackgroundTasks\\AGV\\logs_TEMP"));
+            Console.SetOut(new MyLoger("W:\\BackgroundTasks\\AGV\\logs"));
 #endif
             int milisecoundsWhileSleep = 10000;
             int averageTimeOfPrograms = 4000;
@@ -48,6 +48,7 @@ namespace AGV_BackgroundTask
                 }
                 Thread.Sleep(milisecoundsWhileSleep);
             }
+            Console.WriteLine(" ");
         }
         //
         static async Task<bool> IPOINT_Sequencer()
