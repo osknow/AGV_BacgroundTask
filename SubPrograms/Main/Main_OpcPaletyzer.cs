@@ -137,6 +137,8 @@ namespace AGV_BackgroundTask
                                 //AGV FUll
                                 if (item.REQ_FullPaletPick && agv_machine.pickActive)
                                 {
+                                    // Podział punktu docelowego w razie była by to lista punktów.
+                                    string[] ipointsDestinations = agv_machine.ipoint.Split(",");
                                     // Zadanie dla AGV
                                     #region sBody
                                     var sBodySerwiceAGV = new CreateTaskPozagv02_sBody() { machineType = "", startTime = "", priority = 4, };
@@ -146,8 +148,8 @@ namespace AGV_BackgroundTask
                                         sBodySerwiceAGV.pickupLocation = agv_machine.pick;
                                         MissionPickupId = Convert.ToInt16(agv_machine.pick);
                                         sBodySerwiceAGV.targetLocation = agv_machine.ipoint;
-                                        MissionDropoffId = Convert.ToInt16(agv_machine.ipoint);
                                         sBodySerwiceAGV.resourceTypes = 3;
+
                                         MissionDropoffRequiredLoadType = 3;
                                         MissionPickupRequiredLoadType = 3;
                                         sBodySerwiceAGV.targetShelfId = 1;
@@ -169,8 +171,8 @@ namespace AGV_BackgroundTask
                                         sBodySerwiceAGV.pickupLocation = agv_machine.pick;
                                         MissionPickupId = Convert.ToInt16(agv_machine.pick);
                                         sBodySerwiceAGV.targetLocation = agv_machine.ipoint;
-                                        MissionDropoffId = Convert.ToInt16(agv_machine.ipoint);
                                         sBodySerwiceAGV.resourceTypes = 1;
+
                                         MissionDropoffRequiredLoadType = 1;
                                         MissionPickupRequiredLoadType = 1;
                                         sBodySerwiceAGV.targetShelfId = 2;
@@ -259,6 +261,15 @@ namespace AGV_BackgroundTask
                                                     externalId = "Zadanie PALL Pick: " + item.MachineName;
                                                     taskExistTextAdditional = "1";
                                                 }
+                                                // Punkty docelowe misji (IPOINT) i reszta
+                                                var allowedTargetsIPOINTS = Enumerable.Empty<object>();
+                                                //
+                                                for (int i = 0; i < ipointsDestinations.Length; i++)
+                                                {
+                                                    allowedTargetsIPOINTS = allowedTargetsIPOINTS.Append(new { Id = ipointsDestinations[i], ShelfId = MissionDropoffShelfId });
+                                                }
+
+
                                                 //
                                                 var sBodyMissinsAGV = new
                                                 {
@@ -297,10 +308,7 @@ namespace AGV_BackgroundTask
                                                                 RequiredLoadStatus = "LocationHasRoom"
                                                             }
                                                         },
-                                                        AllowedTargets = new[]
-                                                        {
-                                                            new { Id = MissionDropoffId, ShelfId = MissionDropoffShelfId }
-                                                        },
+                                                        AllowedTargets = allowedTargetsIPOINTS ,
                                                         AllowedWaits = new[]
                                                         {
                                                             new { Id = 6010 },

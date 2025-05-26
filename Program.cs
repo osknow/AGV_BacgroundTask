@@ -1,5 +1,6 @@
 ﻿using AGV_BackgroundTask.SubPrograms;
 using Opc.UaFx.Client;
+using StackPaletsFunction.REQUESTS;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -14,6 +15,8 @@ namespace AGV_BackgroundTask
     {
         public static List<GetMissions> tasks_pozagv02;
         public static AGV_SubMachine IpointStatus = new AGV_SubMachine();
+        public static bool stateIPOINT_Blocked = false;
+        public static bool stateIPOINT_Relesed = false;
         static async Task Main(string[] args)
         {
             //
@@ -23,6 +26,7 @@ namespace AGV_BackgroundTask
 #endif
             int milisecoundsWhileSleep = 10000;
             int averageTimeOfPrograms = 4000;
+
             #region Mathematic Loop While 
             int taskEveryMinutes = 60;
             DateTime startTime = DateTime.Now;
@@ -142,6 +146,33 @@ namespace AGV_BackgroundTask
                 Console.WriteLine("Error:  Błąd podczas aktualizacji danych o IPOINT");
                 Console.WriteLine(e.Message);
                 return false;
+            }
+            try
+            {
+                ////Blokowanie punktu IPOINTA w momencie zatoru na IPOINCIE.
+                //if (IpointStatus.Real_PaletNotPickedTime >= IpointStatus.Setup_PaletNotPickedTime && stateIPOINT_Blocked == false)
+                //{
+
+                //    EnableDisableSymbolicPoint IPOINT = new EnableDisableSymbolicPoint();
+                //    IPOINT.enabled = false;
+                //    IPOINT.symbolicPointId = 4001;
+                //    EnableDisableSymbolicPoint_pozagv02.POST(IPOINT);
+                //    stateIPOINT_Blocked = true;
+                //}
+                //else if (IpointStatus.Real_PaletNotPickedTime == 0 && stateIPOINT_Relesed == false)
+                //{
+
+                //    EnableDisableSymbolicPoint IPOINT = new EnableDisableSymbolicPoint();
+                //    IPOINT.enabled = true;
+                //    IPOINT.symbolicPointId = 4001;
+                //    EnableDisableSymbolicPoint_pozagv02.POST(IPOINT);
+                //    stateIPOINT_Relesed = true;
+                //}
+
+            }
+            catch(Exception e)
+            {
+
             }
             return true;
         }

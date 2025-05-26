@@ -36,6 +36,11 @@ namespace AGV_BackgroundTask
         public int LoadId { get; set; }
         public int Slot { get; set; }
     }
+    public class EnableDisableSymbolicPoint
+    {
+        public int symbolicPointId { get; set; }
+        public bool enabled { get; set; }
+    }
     public class ResourceAtLocation
     {
         public int symbolicPointId { get; set; }
