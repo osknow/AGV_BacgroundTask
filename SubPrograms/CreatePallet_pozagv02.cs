@@ -34,7 +34,7 @@ namespace AGV_BackgroundTask.SubPrograms
                 }
                 else
                 {
-                    Console.WriteLine($"{response.StatusCode} , {response.RequestMessage}, Id punktu: {data.symbolicPointId} , typ: {data.resourceType}, ilość: {data.amount}");
+                    Console.WriteLine($"{response.StatusCode} , {response.RequestMessage}, Id punktu: {data.symbolicPointId} , Typ: {data.resourceType}, Ilość: {data.amount}, Półka: {data.shelfId} ");
                 }
                 }
                 catch(Exception e)
