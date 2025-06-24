@@ -137,8 +137,13 @@ namespace AGV_BackgroundTask
                                 //AGV FUll
                                 if (item.REQ_FullPaletPick && agv_machine.pickActive)
                                 {
-                                    // Podział punktu docelowego w razie była by to lista punktów.
-                                    string[] ipointsDestinations = agv_machine.ipoint.Split(",");
+                                    string[] ipointsDestinations = { };
+                                    if (! (agv_machine.ipoint == null))
+                                    {
+                                        // Podział punktu docelowego w razie była by to lista punktów.
+                                        ipointsDestinations = agv_machine.ipoint.Split(",");
+                                    }
+
                                     // Zadanie dla AGV
                                     #region sBody
                                     var sBodySerwiceAGV = new CreateTaskPozagv02_sBody() { machineType = "", startTime = "", priority = 4, };

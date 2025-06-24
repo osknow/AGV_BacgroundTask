@@ -40,10 +40,10 @@ namespace AGV_BackgroundTask
                 Console.WriteLine("Początek : " + DateTime.Now);
                 //Status mówi o tym czy działa komunikacja z serwerem pozagv02.
                 bool ststusPozagv02 = await IPOINT_Sequencer();
-
-                await Main_OpcPaletyzer.SubMain_AGV_Tasks();
                 // Funkcja aktualizująca zadania przetwarzane przez system AGV.
                 await DuniTaskAGV();
+                await Main_OpcPaletyzer.SubMain_AGV_Tasks();
+
                 i++;
                 Console.WriteLine("Koniec : " + DateTime.Now);
 
@@ -104,7 +104,7 @@ namespace AGV_BackgroundTask
             //
             if (IpointStatus.Name == "IPOINT")
             {
-                if(status_TimeOfPalletOnEntrance >= IpointStatus.Setup_PaletNotPickedTime)
+                if(status_TimeOfPalletOnEntrance > IpointStatus.Setup_PaletNotPickedTime)
                 {
                     IpointStatus.Error_PaletNotPicked = true;
                 }
@@ -128,6 +128,7 @@ namespace AGV_BackgroundTask
             else if ((status_TimeOfPalletOnEntrance < IpointStatus.Setup_IPOINT_EmailPaletNotPickedTime) && (IpointStatus.Email_Sended == true))
             {
                 IpointStatus.Email_Sended = false;
+                IpointStatus.Error_PaletNotPicked = false;
             }
             //
             IpointStatus.E_Stop = status_E_Stop;
