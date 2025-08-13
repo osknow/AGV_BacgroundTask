@@ -635,7 +635,7 @@ namespace AGV_BackgroundTask
                     {
                         // 21.03.2025 BYć może wystarczy tylko raz się połączyć z OPC a potem odczytać wszytskie nody.
                         //Paletyzers REQUEST Signals 
-                        var opc_client = new OpcClient("opc.tcp://POZOPC01:5023/Softing_dataFEED_OPC_Suite_POZOPC_AGV");
+                        var opc_client = new OpcClient("opc.tcp://POZOPC02:5023/Softing_dataFEED_OPC_Suite_POZOPC_AGV");
                         opc_client.Connect();
                         //
                         var FullPalletToPick = opc_client.ReadNode(item.OpcNode_FullPaletPick);
@@ -662,7 +662,7 @@ namespace AGV_BackgroundTask
                 {
                     //Paletyzers REQUEST Signals 
                     //
-                    var opc_client = new OpcClient("opc.tcp://POZOPC01:5023/Softing_dataFEED_OPC_Suite_POZOPC_AGV");
+                    var opc_client = new OpcClient("opc.tcp://POZOPC02:5023/Softing_dataFEED_OPC_Suite_POZOPC_AGV");
                     //
                     opc_client.Connect();
                     //

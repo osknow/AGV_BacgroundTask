@@ -67,7 +67,7 @@ namespace AGV_BackgroundTask
             try
             {
                 //
-                var client = new OpcClient("opc.tcp://POZOPC01:5013/POZOPC_IPOINT_AGV");
+                var client = new OpcClient("opc.tcp://POZOPC02:5013/POZOPC_IPOINT_AGV");
                 client.Connect();
                 //
                 //var Place_status = client.ReadNode("ns=3;s=IPOINT_001_AGV.DB_AGV.Place_1 Free");
