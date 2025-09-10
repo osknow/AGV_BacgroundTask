@@ -251,6 +251,7 @@ namespace AGV_BackgroundTask
                                                 }
                                             }
                                             HttpResponseMessage responseAGV = new HttpResponseMessage();
+                                            bool dataOpcReseted = false;
                                             // Tworzenie zadania
                                             try
                                             {
@@ -324,11 +325,16 @@ namespace AGV_BackgroundTask
                                                 };
                                                 #endregion
                                                 //
-                                                responseAGV = await CreateMission_pozagv02.POST(sBodyMissinsAGV);
+                                                dataOpcReseted = await OPC_WriteData(item.OpcNode_FullPaletPick, state: false);
                                                 //
-                                                if (responseAGV.IsSuccessStatusCode && CreateMission_pozagv02.responseJSON.Success)
+                                                if (dataOpcReseted)
                                                 {
-                                                    OPC_WriteData(item.OpcNode_FullPaletPick);
+                                                    responseAGV = await CreateMission_pozagv02.POST(sBodyMissinsAGV);
+                                                    // Jeśli zadnaie nie pojawiło sie w systemie z uwagi na błąd to będziemy chcieli ponowaić wysłanie.
+                                                    if (!(responseAGV.IsSuccessStatusCode && CreateMission_pozagv02.responseJSON.Success))
+                                                    {
+                                                        dataOpcReseted = await OPC_WriteData(item.OpcNode_FullPaletPick, state: true);
+                                                    }
                                                 }
                                             }
                                             catch
@@ -336,7 +342,7 @@ namespace AGV_BackgroundTask
                                                 Console.WriteLine("Błąd przy stworzeniu zadania z punktu: " + sBodySerwiceAGV.pickupLocation + " do punktu: " + sBodySerwiceAGV.targetLocation);
                                             }
                                             //
-                                            if (responseAGV.IsSuccessStatusCode && CreateMission_pozagv02.responseJSON.Success)
+                                            if (responseAGV.IsSuccessStatusCode && CreateMission_pozagv02.responseJSON.Success && dataOpcReseted)
                                             {
                                                 Console.WriteLine($" Utworzono zadanie {taskExistTextAdditional} dla AGV - maszyna {machine.Name} z Id: {CreateMission_pozagv02.responseJSON.InternalId}. | " + "{ pickupLocation:" + sBodySerwiceAGV.pickupLocation + ", pickupShelfId:" + sBodySerwiceAGV.pickupShelfId + ", targetLocation:" + sBodySerwiceAGV.targetLocation + ", targetShelfId:" + sBodySerwiceAGV.targetShelfId + ", resourceTypes:" + sBodySerwiceAGV.resourceTypes + "}");
                                                 // Zadanie na serwer POZMDA01
@@ -413,12 +419,19 @@ namespace AGV_BackgroundTask
                                                 }
                                             }
                                             // Zadanie dla SERWISU 
-                                            var response = await CreateTask_pozmda02.POST(sBodySerwice);
-                                            if (response.IsSuccessStatusCode)
-                                            {
-
-                                                OPC_WriteData(item.OpcNode_FullPaletPick);
-                                                Console.WriteLine($"IPOINT AWARIA - Przekierowano zadanie dla SERWISU dla maszyny {machine.Name}. | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
+                                            //
+                                            // Najpierw skasowanie OPC
+                                            bool dataOpcDeleted = await OPC_WriteData(item.OpcNode_FullPaletPick, state: false);
+                                            Console.WriteLine($"IPOINT AWARIA - Przekierowano zadanie dla SERWISU dla maszyny {machine.Name}. | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
+                                            //
+                                            if (dataOpcDeleted)
+                                            { 
+                                                var response = await CreateTask_pozmda02.POST(sBodySerwice);
+                                                // Jeśli zadnaie nie pojawiło sie w systemie z uwagi na błąd to będziemy chcieli ponowaić wysłanie.
+                                                if (!response.IsSuccessStatusCode)
+                                                {
+                                                    await OPC_WriteData(item.OpcNode_FullPaletPick, state: true);
+                                                }
                                             }
                                         }
                                     }
@@ -449,12 +462,19 @@ namespace AGV_BackgroundTask
                                     if (SERVICE_TaskExist == false)
                                     {
                                         // Zadanie dla SERWISU
-
-                                        var response = await CreateTask_pozmda02.POST(sBodySerwice);
-                                        if (response.IsSuccessStatusCode)
+                                        //
+                                        // Najpierw skasowanie OPC
+                                        bool dataOpcReseted = await OPC_WriteData(item.OpcNode_FullPaletPick, state: false);
+                                        Console.WriteLine($"Utworzono zadanie dla SERWISU dla maszyny {machine.Name}.  | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
+                                        //
+                                        if (dataOpcReseted)
                                         {
-                                            OPC_WriteData(item.OpcNode_FullPaletPick);
-                                            Console.WriteLine($"Utworzono zadanie dla SERWISU dla maszyny {machine.Name}.  | " + "{ Details:" + sBodySerwice.Details + ", Name:" + sBodySerwice.Name + "}");
+                                            var response = await CreateTask_pozmda02.POST(sBodySerwice);
+                                            // Jeśli zadnaie nie pojawiło sie w systemie z uwagi na błąd to będziemy chcieli ponowaić wysłanie.
+                                            if (! response.IsSuccessStatusCode)
+                                            {
+                                               await OPC_WriteData(item.OpcNode_FullPaletPick, state: true);
+                                            }
                                         }
                                     }
                                     SERVICE_TaskExist = false;
@@ -656,7 +676,7 @@ namespace AGV_BackgroundTask
             }
             
         }
-        static async Task OPC_WriteData( string node)
+        static async Task<bool> OPC_WriteData( string node, bool state)
         {
                 try
                 {
@@ -666,16 +686,18 @@ namespace AGV_BackgroundTask
                     //
                     opc_client.Connect();
                     //
-                    var FullPalletToPick = opc_client.WriteNode(node, false);
+                    var FullPalletToPick = opc_client.WriteNode(node, state);
                     //
                     //Thread.Sleep(100);
                     Console.WriteLine("Odpowiedz po wysłaniu żądania resetu OPC na node: "+ node +" |  Status IsGood : "+ FullPalletToPick.IsGood + ", Status isBad: "+ FullPalletToPick.IsBad);
-                //
-                if (FullPalletToPick.IsBad)
-                {
-                    Console.WriteLine("Opis błędu: " + FullPalletToPick.Description);
-                }
+                    //
+                    if (FullPalletToPick.IsBad)
+                    {
+                        Console.WriteLine("Opis błędu: " + FullPalletToPick.Description);
+                        return false;
+                    }
                     opc_client.Disconnect();
+                    return true;
                     //
                 }
                 catch (Exception e)
@@ -683,6 +705,7 @@ namespace AGV_BackgroundTask
 
                     Console.WriteLine($"Problem with write data OPC. Node: {node} // Type: {0}. Message : {1}", e.GetType(), e.Message);
                     Console.WriteLine(e);
+                    return false;
                 }
         }
     }
