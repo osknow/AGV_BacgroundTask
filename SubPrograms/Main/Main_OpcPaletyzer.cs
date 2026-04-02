@@ -232,7 +232,7 @@ namespace AGV_BackgroundTask
                                         if (AGV_TaskExist == false)
                                         {
                                             //Tworzenie palety dla systemu AGV
-                                            if (sBodySerwiceAGV.targetLocation.Contains("4001") && SERVICE_TaskExist == false)
+                                            if ( ( sBodySerwiceAGV.targetLocation.Contains("4001") || sBodySerwiceAGV.targetLocation.Contains("4002") || sBodySerwiceAGV.targetLocation.Contains("4003") || sBodySerwiceAGV.targetLocation.Contains("4004") || sBodySerwiceAGV.targetLocation.Contains("4005") || sBodySerwiceAGV.targetLocation.Contains("4006") ) && SERVICE_TaskExist == false)
                                             {
                                                 var pallet = new ResourceAtLocation()
                                                 {
